@@ -34,7 +34,6 @@ def main() -> None:
         "intel_reports": {},
         "ticker_dossiers": {},
         "adversarial_debate": {},
-        "desk_quant_Drafts": {},
         "desk_proposals": {},
         "risk_sub_reports": {},
         "risk_assessment": None,

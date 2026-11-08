@@ -7,19 +7,20 @@ An institutional **24-Node Hierarchical Multi-Strategy Hedge Fund** built in **L
 ## 🏗️ Advanced Agentic Architecture Patterns Implemented
 
 1. **Dynamic Map-Reduce Fan-Out (`Send()` API)**:
-   - [`fan_out_from_cio_router`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L195-L212) simultaneously triggers **6 parallel Intelligence Syndicate specialists** AND dynamically spawns **N parallel [`ticker_deep_research_worker`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L430-L458) instances via `Send()`** for single-ticker deep microstructure/technical dossier generation, converging at [`intelligence_aggregator_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L461-L479).
+   - [`fan_out_from_cio_router`](src/trading_desk/graph.py) simultaneously triggers **6 parallel Intelligence Syndicate specialists** AND dynamically spawns **N parallel [`ticker_deep_research_worker`](src/trading_desk/graph.py) instances via `Send()`** for single-ticker deep microstructure/technical dossier generation, converging at [`intelligence_aggregator_node`](src/trading_desk/graph.py).
 2. **Adversarial Dialectic Debate & Arbiter Chamber**:
-   - [`bull_thesis_advocate_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L492-L511) (Bullish Growth Director) and [`bear_thesis_critic_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L514-L533) (Forensic Short-Seller & Red-Team Critic) argue opposing cases in parallel before [`adversarial_debate_arbiter_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L536-L567) synthesizes the winning directional tilt and desk capital weights.
-3. **Compiled Multi-Agent Strategy Desk Subgraphs (`4 Parallel Subgraphs = 8 Internal Nodes`)**:
-   - Built via [`create_strategy_desk_subgraph`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L620-L702), each of the 4 desks (`MOMENTUM_DESK`, `STAT_ARB_DESK`, `MACRO_VOL_DESK`, `EVENT_ARB_DESK`) is a compiled `StateGraph` subgraph containing two internal agents:
-     - **`desk_quant_modeler`**: Runs mathematical signal selection & derivatives/pair structuring (`DeskQuantModelOutput`).
+   - [`bull_thesis_advocate_node`](src/trading_desk/graph.py) (Bullish Growth Director) and [`bear_thesis_critic_node`](src/trading_desk/graph.py) (Forensic Short-Seller & Red-Team Critic) argue opposing cases in parallel before [`adversarial_debate_arbiter_node`](src/trading_desk/graph.py) synthesizes the winning directional tilt and desk capital weights.
+3. **One Compiled Strategy Desk Subgraph, Dispatched per Desk via `Send()`**:
+   - [`build_strategy_desk_subgraph`](src/trading_desk/graph.py) compiles a single 2-node `StateGraph` that is run once per desk (`MOMENTUM_DESK`, `STAT_ARB_DESK`, `MACRO_VOL_DESK`, `EVENT_ARB_DESK`). The desk is chosen by `desk_name` in the `Send()` payload ([`dispatch_strategy_desks`](src/trading_desk/graph.py)), so a revision round re-runs only the flagged desks with no extra nodes or edges.
+     - **`desk_quant_modeler`**: Runs mathematical signal selection & derivatives/pair structuring (`DeskQuantModelOutput`). The draft is private to the subgraph.
      - **`desk_head_pm`**: Reviews quant signals & CRO directives and signs off on the desk mandate (`DeskMandateProposal`).
+   - The subgraph takes a small `DeskInput` (`desk_name`, `revision_count`, prebuilt `context`) and returns a `DeskOutput` (`desk_proposals`, `messages`). It does not mirror the parent state.
 4. **Parallel Triad Risk Committee & Selective Desk Re-Dispatch Loop**:
-   - [`factor_exposure_auditor_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L725-L751) and [`tail_var_monte_carlo_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L754-L779) run in parallel across the combined 4-desk book before converging at [`cro_risk_synthesis_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L782-L867).
-   - If mandate breaches occur (`REVISE_DESKS`), [`route_after_cro_synthesis`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L870-L886) selectively re-dispatches **only** the specific Strategy Desk Subgraphs flagged with `must_revise=True`.
+   - [`factor_exposure_auditor_node`](src/trading_desk/graph.py) and [`tail_var_monte_carlo_node`](src/trading_desk/graph.py) run in parallel across the combined 4-desk book before converging at [`cro_risk_synthesis_node`](src/trading_desk/graph.py).
+   - The deterministic risk engine, not the LLM, sets the CRO status. If breaches occur (`REVISE_DESKS`), [`route_after_cro_synthesis`](src/trading_desk/graph.py) selectively re-dispatches **only** the desks flagged with `must_revise=True`. Breaches that survive the last revision round are `REJECTED` and route to `halt_no_trade`: the gate fails closed and nothing reaches the Head of Trading.
 5. **Two-Stage Execution Hierarchy (Head of Trading -> Microstructure EMS Router)**:
-   - [`head_of_trading_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L893-L936) issues the master capital allocation and parent execution tickets.
-   - [`execution_microstructure_router_node`](file:///Users/garyamorris/Developer/repos/complex-langraph/src/trading_desk/graph.py#L939-L983) uses Databento L1 spread & orderbook imbalance to slice parent tickets into child orders across Dark Pools, IEX D-Limit, and Lit venues, estimates TCA slippage in bps/USD, and generates ready-to-submit Alpaca `v2/orders` JSON payloads.
+   - [`head_of_trading_node`](src/trading_desk/graph.py) issues the master capital allocation and parent execution tickets.
+   - [`execution_microstructure_router_node`](src/trading_desk/graph.py) uses Databento L1 spread & orderbook imbalance to slice parent tickets into child orders across Dark Pools, IEX D-Limit, and Lit venues, estimates TCA slippage in bps/USD, and generates ready-to-submit Alpaca `v2/orders` JSON payloads.
 
 ---
 
@@ -52,7 +53,7 @@ flowchart TD
 
     AGG --> BULL & BEAR
 
-    subgraph TIER3["Tier 3: 4 Parallel Multi-Agent Strategy Desk Subgraphs (2 Nodes Each)"]
+    subgraph TIER3["Tier 3: Strategy Desk Subgraph x4 via Send() (2 Nodes Each)"]
         MOM["🎯 Momentum Desk Subgraph\n(Quant Modeler -> Desk Head PM)"]
         STAT["⚖️ Stat-Arb Desk Subgraph\n(Quant Modeler -> Desk Head PM)"]
         VOL["🛡️ Macro/Vol Desk Subgraph\n(Quant Modeler -> Desk Head PM)"]
@@ -78,8 +79,20 @@ flowchart TD
     end
 
     CRO -- "APPROVED" --> HOT
+    CRO -- "REJECTED (breaches survive max revisions)" --> HALT["🛑 Trading Halt\n(halt_no_trade)"]
+    HALT --> END
     EMS --> END((END))
 ```
+
+---
+
+## 🧱 State Design
+
+[`TradingDeskState`](src/trading_desk/state.py) holds typed Pydantic objects, not dumped dicts. Only channels that parallel branches write to the same key use the `merge_dicts` reducer (`intel_reports`, `ticker_dossiers`, `adversarial_debate`, `desk_proposals`, `risk_sub_reports`); the rest are plain last-value channels. The desk subgraph's working state (`DeskState`, including the quant draft) stays private to it.
+
+The Decisions API answers are stored on the models as `openai_decisions_api`. That field is hidden from the LLM's structured-output schema.
+
+Because the state holds Pydantic models, `langgraph.json` allowlists them under `serde.allowed_msgpack_modules`. Add a new top-level state model there if you add one.
 
 ---
 
@@ -96,4 +109,10 @@ The local LangGraph Studio dev server is running on port `2024`:
 ### 2. Run End-to-End from CLI
 ```bash
 uv run python run_example.py
+```
+
+### 3. Run the Offline Wiring Tests
+LLMs, market-data tools and Decisions-API calls are stubbed, so no keys, network or cost are needed. The real risk engine is used.
+```bash
+uv run python -m unittest discover -s tests -v
 ```

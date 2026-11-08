@@ -3,5 +3,25 @@
   "graphs": {
     "trading_desk": "./src/trading_desk/graph.py:graph"
   },
-  "env": ".env"
+  "env": ".env",
+  "serde": {
+    "allowed_msgpack_modules": [
+      ["trading_desk.state", "CIORegimeMandate"],
+      ["trading_desk.state", "PremarketBrief"],
+      ["trading_desk.state", "TechnicalSignalReport"],
+      ["trading_desk.state", "MacroRegimeReport"],
+      ["trading_desk.state", "NewsSentimentReport"],
+      ["trading_desk.state", "VolSurfaceReport"],
+      ["trading_desk.state", "FactorCointegrationReport"],
+      ["trading_desk.state", "TickerDeepResearchDossier"],
+      ["trading_desk.state", "DebateArgument"],
+      ["trading_desk.state", "AdversarialDebateResolution"],
+      ["trading_desk.state", "DeskMandateProposal"],
+      ["trading_desk.state", "FactorExposureAudit"],
+      ["trading_desk.state", "TailRiskMonteCarloReport"],
+      ["trading_desk.state", "PortfolioRiskReport"],
+      ["trading_desk.state", "HeadOfTradingDecision"],
+      ["trading_desk.state", "ExecutionMicrostructurePlan"]
+    ]
+  }
 }

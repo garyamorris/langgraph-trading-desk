@@ -5,17 +5,16 @@ from __future__ import annotations
 import json
 import os
 import re
-from typing import Annotated, Any
-from typing_extensions import TypedDict
+from typing import Any, get_args
 
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
-from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
-from langgraph.graph.message import add_messages
 from langgraph.types import Send
+from pydantic import BaseModel
 
 from trading_desk.decisions_engine import (
     evaluate_cro_gate_via_decisions_api,
@@ -46,13 +45,17 @@ from trading_desk.prompts import (
 from trading_desk.state import (
     AdversarialDebateResolution,
     ApprovedExecutionTicket,
+    ChildOrderSliceSchedule,
     CIORegimeMandate,
     DebateArgument,
     DeskCapitalAllocation,
+    DeskInput,
     DeskMandateProposal,
+    DeskName,
+    DeskOutput,
     DeskQuantModelOutput,
     DeskRiskDirective,
-    DeskSubgraphState,
+    DeskState,
     ExecutionMicrostructurePlan,
     FactorCointegrationReport,
     FactorExposureAudit,
@@ -67,7 +70,6 @@ from trading_desk.state import (
     TickerWorkerState,
     TradingDeskState,
     VolSurfaceReport,
-    merge_dicts,
 )
 from trading_desk.tools import (
     COINTEGRATION_TOOLS,
@@ -103,13 +105,8 @@ TOOL_MAP = {
 }
 
 DEFAULT_UNIVERSE = ["NVDA", "AMD", "MSFT", "SPY", "QQQ", "TLT"]
-ALL_DESKS = ["MOMENTUM_DESK", "STAT_ARB_DESK", "MACRO_VOL_DESK", "EVENT_ARB_DESK"]
-DESK_TO_NODE = {
-    "MOMENTUM_DESK": "momentum_desk_subgraph",
-    "STAT_ARB_DESK": "stat_arb_desk_subgraph",
-    "MACRO_VOL_DESK": "macro_vol_desk_subgraph",
-    "EVENT_ARB_DESK": "event_arb_desk_subgraph",
-}
+ALL_DESKS: list[str] = list(get_args(DeskName))
+DESK_NODE = "strategy_desk"  # one compiled subgraph, dispatched once per desk via Send()
 
 
 def _get_llm(temperature: float | None = None) -> ChatOpenAI:
@@ -117,7 +114,18 @@ def _get_llm(temperature: float | None = None) -> ChatOpenAI:
     model_name = os.getenv("OPENAI_MODEL", "gpt-6-luna")
     if "luna" in model_name.lower():
         return ChatOpenAI(model=model_name)
-    return ChatOpenAI(model=model_name, temperature=temperature or 0.1)
+    return ChatOpenAI(model=model_name, temperature=0.1 if temperature is None else temperature)
+
+
+def _model_default(obj: Any) -> Any:
+    if isinstance(obj, BaseModel):
+        return obj.model_dump()
+    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+
+def _json(obj: Any) -> str:
+    """Pretty JSON for prompt context. State holds Pydantic models, so dump them on the way out."""
+    return json.dumps(obj, indent=2, default=_model_default)
 
 
 def _extract_focus_tickers(state: TradingDeskState) -> list[str]:
@@ -203,7 +211,7 @@ def cio_regime_router_node(state: TradingDeskState) -> dict[str, Any]:
     )
     return {
         "focus_tickers": chosen_tickers,
-        "cio_mandate": mandate.model_dump(),
+        "cio_mandate": mandate,
         "revision_count": state.get("revision_count") or 0,
         "max_revisions": state.get("max_revisions") or 2,
         "messages": [AIMessage(content=msg, name="CIO_Regime_Router")],
@@ -260,7 +268,7 @@ def premarket_microstructure_node(state: TradingDeskState) -> dict[str, Any]:
         f"- **Orderbook Microstructure (Databento `mbp-1`)**: {brief.microstructure_summary}"
     )
     return {
-        "intel_reports": {"premarket": brief.model_dump()},
+        "intel_reports": {"premarket": brief},
         "messages": [AIMessage(content=msg, name="Premarket_Microstructure_Analyst")],
     }
 
@@ -293,7 +301,7 @@ def technical_analyst_node(state: TradingDeskState) -> dict[str, Any]:
         f"- **Signals**:\n{sig_lines}"
     )
     return {
-        "intel_reports": {"technicals": report.model_dump()},
+        "intel_reports": {"technicals": report},
         "messages": [AIMessage(content=msg, name="Quant_Technical_Analyst")],
     }
 
@@ -319,7 +327,7 @@ def macro_strategist_node(state: TradingDeskState) -> dict[str, Any]:
         f"- **Rates, Credit & Dollar View**: {report.rates_and_dollar_view}"
     )
     return {
-        "intel_reports": {"macro": report.model_dump()},
+        "intel_reports": {"macro": report},
         "messages": [AIMessage(content=msg, name="Global_Macro_Strategist")],
     }
 
@@ -349,7 +357,7 @@ def news_sentiment_node(state: TradingDeskState) -> dict[str, Any]:
         f"- **Breaking Headlines**:\n{headlines_md}"
     )
     return {
-        "intel_reports": {"news": report.model_dump()},
+        "intel_reports": {"news": report},
         "messages": [AIMessage(content=msg, name="News_Sentiment_Analyst")],
     }
 
@@ -381,7 +389,7 @@ def vol_surface_analyst_node(state: TradingDeskState) -> dict[str, Any]:
         f"- **Vol Surface Readouts**:\n{vol_lines}"
     )
     return {
-        "intel_reports": {"vol_surface": report.model_dump()},
+        "intel_reports": {"vol_surface": report},
         "messages": [AIMessage(content=msg, name="Vol_Surface_Gamma_Analyst")],
     }
 
@@ -413,7 +421,7 @@ def factor_cointegration_analyst_node(state: TradingDeskState) -> dict[str, Any]
         f"- **Top Cointegrated Stat-Arb Pairs**:\n{pair_lines}"
     )
     return {
-        "intel_reports": {"cointegration": report.model_dump()},
+        "intel_reports": {"cointegration": report},
         "messages": [AIMessage(content=msg, name="Factor_Cointegration_Analyst")],
     }
 
@@ -452,10 +460,9 @@ def ticker_deep_research_worker(state: TickerWorkerState) -> dict[str, Any]:
         ]
     )
     dossier.ticker = ticker
-    dossier_dict = dossier.model_dump()
-    dossier_dict["openai_decisions_api"] = decisions_eval["answers"]
+    dossier.openai_decisions_api = decisions_eval["answers"]
     return {
-        "ticker_dossiers": {ticker: dossier_dict},
+        "ticker_dossiers": {ticker: dossier},
     }
 
 
@@ -464,14 +471,14 @@ def intelligence_aggregator_node(state: TradingDeskState) -> dict[str, Any]:
     dossiers = state.get("ticker_dossiers") or {}
     lines = []
     for sym, d in dossiers.items():
-        dec = d.get("openai_decisions_api") or {}
+        dec = d.openai_decisions_api
         flow_prob = dec.get("institutional_orderflow_supportive", {}).get("probability", 0.5)
         tail_prob = dec.get("event_or_tail_risk_elevated", {}).get("probability", 0.5)
         conv_score = dec.get("setup_conviction_tier", {}).get("score", 0.0)
         lines.append(
-            f"  - **{sym}** (Alpha `{d.get('composite_alpha_score', 0):+.1f}/10` | Spot `${d.get('live_spot_price', 0):.2f}` | OBI `{d.get('microstructure_obi', 0):+.3f}`): "
-            f"`{d.get('preferred_direction')}` via `{d.get('preferred_instrument')}` "
-            f"(Target `${d.get('suggested_target', 0):.2f}`, Stop `${d.get('suggested_stop_within_7pct', 0):.2f}`) "
+            f"  - **{sym}** (Alpha `{d.composite_alpha_score:+.1f}/10` | Spot `${d.live_spot_price:.2f}` | OBI `{d.microstructure_obi:+.3f}`): "
+            f"`{d.preferred_direction}` via `{d.preferred_instrument}` "
+            f"(Target `${d.suggested_target:.2f}`, Stop `${d.suggested_stop_within_7pct:.2f}`) "
             f"— **Decisions API (`gpt-6-luna`)**: Flow Supportive `{flow_prob:.0%}`, Tail Risk `{tail_prob:.0%}`, Conviction Score `{conv_score:.2f}`"
         )
     dossier_md = "\n".join(lines) if lines else "  - Dossiers merged."
@@ -490,9 +497,9 @@ def intelligence_aggregator_node(state: TradingDeskState) -> dict[str, Any]:
 
 def _debate_context(state: TradingDeskState) -> str:
     return (
-        f"CIO Mandate:\n{json.dumps(state.get('cio_mandate'), indent=2)}\n\n"
-        f"Tier-1 Intelligence Syndicate Reports:\n{json.dumps(state.get('intel_reports'), indent=2)}\n\n"
-        f"Single-Name Deep Research Dossiers:\n{json.dumps(state.get('ticker_dossiers'), indent=2)}"
+        f"CIO Mandate:\n{_json(state.get('cio_mandate'))}\n\n"
+        f"Tier-1 Intelligence Syndicate Reports:\n{_json(state.get('intel_reports'))}\n\n"
+        f"Single-Name Deep Research Dossiers:\n{_json(state.get('ticker_dossiers'))}"
     )
 
 
@@ -515,7 +522,7 @@ def bull_thesis_advocate_node(state: TradingDeskState) -> dict[str, Any]:
         f"- **Critique of Bear Case**: {arg.critique_of_opponent}"
     )
     return {
-        "adversarial_debate": {"bull_case": arg.model_dump()},
+        "adversarial_debate": {"bull_case": arg},
         "messages": [AIMessage(content=msg, name="Bull_Research_Director")],
     }
 
@@ -539,7 +546,7 @@ def bear_thesis_critic_node(state: TradingDeskState) -> dict[str, Any]:
         f"- **Critique of Bull Case**: {arg.critique_of_opponent}"
     )
     return {
-        "adversarial_debate": {"bear_case": arg.model_dump()},
+        "adversarial_debate": {"bear_case": arg},
         "messages": [AIMessage(content=msg, name="Bear_Short_Seller")],
     }
 
@@ -552,8 +559,8 @@ def adversarial_debate_arbiter_node(state: TradingDeskState) -> dict[str, Any]:
 
     debate_evidence = (
         f"{_debate_context(state)}\n\n"
-        f"Bull Director Argument:\n{json.dumps(debate.get('bull_case'), indent=2)}\n\n"
-        f"Bear Short-Seller Argument:\n{json.dumps(debate.get('bear_case'), indent=2)}"
+        f"Bull Director Argument:\n{_json(debate.get('bull_case'))}\n\n"
+        f"Bear Short-Seller Argument:\n{_json(debate.get('bear_case'))}"
     )
 
     # Call OpenAI Decisions API (client.decisions.create) to score Bull vs Bear rigor & select winning tilt
@@ -591,10 +598,9 @@ def adversarial_debate_arbiter_node(state: TradingDeskState) -> dict[str, Any]:
         f"- **Desk Capital Weights**: {', '.join(resolution.desk_allocation_weights_pct)}\n"
         f"- **CIO Arbiter Memo**: {resolution.cio_synthesis_memo}"
     )
-    res_dict = resolution.model_dump()
-    res_dict["openai_decisions_api"] = ans
+    resolution.openai_decisions_api = ans
     return {
-        "adversarial_debate": {"resolution": res_dict},
+        "adversarial_debate": {"resolution": resolution},
         "messages": [AIMessage(content=msg, name="CIO_Debate_Arbiter")],
     }
 
@@ -626,6 +632,7 @@ def _format_desk_proposal_markdown(proposal: DeskMandateProposal, revision_count
 
 
 def _build_desk_context(state: TradingDeskState, desk_name: str) -> str:
+    """Prompt context for one desk, built by the parent so the desk subgraph needs no mirror of parent state."""
     intel = state.get("intel_reports") or {}
     dossiers = state.get("ticker_dossiers") or {}
     debate = state.get("adversarial_debate") or {}
@@ -635,22 +642,19 @@ def _build_desk_context(state: TradingDeskState, desk_name: str) -> str:
 
     parts = [
         f"TARGET STRATEGY DESK: {desk_name} (Revision Round: {rev})\n",
-        f"SINGLE-NAME DEEP DOSSIERS (USE THESE EXACT LIVE SPOT PRICES):\n{json.dumps(dossiers, indent=2)}\n",
-        f"ADVERSARIAL DEBATE RESOLUTION:\n{json.dumps(debate.get('resolution'), indent=2)}\n",
-        f"TIER-1 INTELLIGENCE SUMMARY:\n{json.dumps(intel, indent=2)}\n",
+        f"SINGLE-NAME DEEP DOSSIERS (USE THESE EXACT LIVE SPOT PRICES):\n{_json(dossiers)}\n",
+        f"ADVERSARIAL DEBATE RESOLUTION:\n{_json(debate.get('resolution'))}\n",
+        f"TIER-1 INTELLIGENCE SUMMARY:\n{_json(intel)}\n",
     ]
     if rev > 0 and prior_risk:
-        directives_list = prior_risk.get("desk_directives") or []
-        directive_map = {
-            d.get("desk_name"): d.get("directive")
-            for d in directives_list
-            if isinstance(d, dict)
-        }
-        directive = directive_map.get(desk_name, "Maintain compliant book and tight stops.")
+        directive = next(
+            (d.directive for d in prior_risk.desk_directives if d.desk_name == desk_name),
+            "Maintain compliant book and tight stops.",
+        )
         parts.append(
             f"=== URGENT CRO RISK COMMITTEE DIRECTIVE (REVISION ROUND #{rev}) ===\n"
-            f"Your Previous {desk_name} Book:\n{json.dumps(prior_desk, indent=2)}\n\n"
-            f"Firm-Wide Active Breaches:\n{json.dumps(prior_risk.get('limit_breaches', []), indent=2)}\n\n"
+            f"Your Previous {desk_name} Book:\n{_json(prior_desk)}\n\n"
+            f"Firm-Wide Active Breaches:\n{_json(prior_risk.limit_breaches)}\n\n"
             f"Specific Directive for {desk_name}:\n{directive}\n\n"
             "MANDATORY COMPLIANCE RULES FOR REVISION:\n"
             "1. Every single leg `notional_usd` MUST be <= $9,000,000 (and total desk gross <= $18,000,000).\n"
@@ -661,85 +665,93 @@ def _build_desk_context(state: TradingDeskState, desk_name: str) -> str:
     return "\n".join(parts)
 
 
-class DeskSubgraphOutput(TypedDict):
-    """Output schema for a Strategy Desk Subgraph so only reducer-backed channels are emitted to the parent graph."""
+def _desk_input(state: TradingDeskState, desk_name: str) -> DeskInput:
+    return {
+        "desk_name": desk_name,  # type: ignore[typeddict-item]
+        "revision_count": state.get("revision_count") or 0,
+        "context": _build_desk_context(state, desk_name),
+    }
 
-    desk_quant_Drafts: Annotated[dict[str, Any], merge_dicts]
-    desk_proposals: Annotated[dict[str, Any], merge_dicts]
-    messages: Annotated[list[AnyMessage], add_messages]
+
+def dispatch_strategy_desks(state: TradingDeskState) -> list[Send]:
+    """Debate arbiter -> one `Send` per desk into the single shared desk subgraph."""
+    return [Send(DESK_NODE, _desk_input(state, desk)) for desk in ALL_DESKS]
 
 
-def create_strategy_desk_subgraph(
-    desk_name: str,
-):
-    """Build a compiled 2-node LangGraph Subgraph (`desk_quant_modeler -> desk_head_pm`) for a strategy desk."""
+def _enforce_revision_limits(proposal: DeskMandateProposal) -> None:
+    """Hard clamps on revision rounds so a desk head cannot re-submit an oversized book."""
+    for leg in proposal.proposed_legs:
+        if leg.notional_usd > 8_500_000:
+            leg.notional_usd = 8_000_000.0
+        if leg.entry_price > 0:
+            dist_pct = abs(leg.entry_price - leg.stop_loss) / leg.entry_price * 100.0
+            if dist_pct > 6.5:
+                leg.stop_loss = round(leg.entry_price * (0.94 if leg.direction == "LONG" else 1.06), 2)
+        if proposal.desk_name == "MOMENTUM_DESK" and leg.ticker in ("NVDA", "AMD", "SMH") and leg.instrument == "EQUITY":
+            leg.instrument = "CALL_SPREAD"
 
-    def desk_quant_modeler_node(state: DeskSubgraphState) -> dict[str, Any]:
-        llm = _get_llm(temperature=0.1)
-        structured_llm = llm.with_structured_output(DeskQuantModelOutput)
-        context = _build_desk_context(state, desk_name)  # type: ignore[arg-type]
 
-        quant_draft: DeskQuantModelOutput = structured_llm.invoke(
-            [
-                SystemMessage(content=DESK_QUANT_PROMPT.format(desk_name=desk_name)),
-                HumanMessage(content=context),
-            ]
-        )
-        quant_draft.desk_name = desk_name  # type: ignore[assignment]
-        for leg in quant_draft.candidate_legs:
-            leg.desk = desk_name  # type: ignore[assignment]
-        return {
-            "desk_quant_Drafts": {desk_name: quant_draft.model_dump()},
-        }
+def desk_quant_modeler_node(state: DeskState) -> dict[str, Any]:
+    """Desk subgraph, step 1: the Quant Modeler drafts candidate legs. The draft stays private to the subgraph."""
+    desk_name = state["desk_name"]
+    llm = _get_llm(temperature=0.1)
+    structured_llm = llm.with_structured_output(DeskQuantModelOutput)
 
-    def desk_head_pm_node(state: DeskSubgraphState) -> dict[str, Any]:
-        llm = _get_llm(temperature=0.1)
-        structured_llm = llm.with_structured_output(DeskMandateProposal)
-        rev = state.get("revision_count") or 0
-        quant_draft = (state.get("desk_quant_Drafts") or {}).get(desk_name, {})
-        context = _build_desk_context(state, desk_name)  # type: ignore[arg-type]
+    quant_draft: DeskQuantModelOutput = structured_llm.invoke(
+        [
+            SystemMessage(content=DESK_QUANT_PROMPT.format(desk_name=desk_name)),
+            HumanMessage(content=state["context"]),
+        ]
+    )
+    quant_draft.desk_name = desk_name
+    for leg in quant_draft.candidate_legs:
+        leg.desk = desk_name
+    return {"quant_draft": quant_draft}
 
-        proposal: DeskMandateProposal = structured_llm.invoke(
-            [
-                SystemMessage(content=DESK_HEAD_SUBGRAPH_PROMPT.format(desk_name=desk_name)),
-                HumanMessage(
-                    content=(
-                        f"{context}\n\n"
-                        f"Desk Quant Modeler Candidate Output:\n{json.dumps(quant_draft, indent=2)}\n\n"
-                        f"Review, refine, and issue the final signed-off `DeskMandateProposal` for `{desk_name}`."
-                    )
-                ),
-            ]
-        )
-        proposal.desk_name = desk_name  # type: ignore[assignment]
-        for leg in proposal.proposed_legs:
-            leg.desk = desk_name  # type: ignore[assignment]
-            if rev > 0:
-                if leg.notional_usd > 8_500_000:
-                    leg.notional_usd = 8_000_000.0
-                if leg.entry_price > 0:
-                    dist_pct = abs(leg.entry_price - leg.stop_loss) / leg.entry_price * 100.0
-                    if dist_pct > 6.5:
-                        if leg.direction == "LONG":
-                            leg.stop_loss = round(leg.entry_price * 0.94, 2)
-                        else:
-                            leg.stop_loss = round(leg.entry_price * 1.06, 2)
-                if desk_name == "MOMENTUM_DESK" and leg.ticker in ("NVDA", "AMD", "SMH") and leg.instrument == "EQUITY":
-                    leg.instrument = "CALL_SPREAD"
 
-        proposal.total_gross_notional_usd = sum(abs(l.notional_usd) for l in proposal.proposed_legs)
-        proposal.total_net_notional_usd = sum(
-            l.notional_usd if l.direction == "LONG" else -l.notional_usd
-            for l in proposal.proposed_legs
-        )
+def desk_head_pm_node(state: DeskState) -> dict[str, Any]:
+    """Desk subgraph, step 2: the Desk Head signs off and the proposal is written back to the parent."""
+    desk_name = state["desk_name"]
+    rev = state["revision_count"]
+    llm = _get_llm(temperature=0.1)
+    structured_llm = llm.with_structured_output(DeskMandateProposal)
 
-        md = _format_desk_proposal_markdown(proposal, rev)
-        return {
-            "desk_proposals": {desk_name: proposal.model_dump()},
-            "messages": [AIMessage(content=md, name=f"{desk_name}_Subgraph")],
-        }
+    proposal: DeskMandateProposal = structured_llm.invoke(
+        [
+            SystemMessage(content=DESK_HEAD_SUBGRAPH_PROMPT.format(desk_name=desk_name)),
+            HumanMessage(
+                content=(
+                    f"{state['context']}\n\n"
+                    f"Desk Quant Modeler Candidate Output:\n{_json(state['quant_draft'])}\n\n"
+                    f"Review, refine, and issue the final signed-off `DeskMandateProposal` for `{desk_name}`."
+                )
+            ),
+        ]
+    )
+    proposal.desk_name = desk_name
+    for leg in proposal.proposed_legs:
+        leg.desk = desk_name
+    if rev > 0:
+        _enforce_revision_limits(proposal)
 
-    sub = StateGraph(DeskSubgraphState, output_schema=DeskSubgraphOutput)
+    proposal.total_gross_notional_usd = sum(abs(l.notional_usd) for l in proposal.proposed_legs)
+    proposal.total_net_notional_usd = sum(
+        l.notional_usd if l.direction == "LONG" else -l.notional_usd
+        for l in proposal.proposed_legs
+    )
+
+    return {
+        "desk_proposals": {desk_name: proposal},
+        "messages": [AIMessage(content=_format_desk_proposal_markdown(proposal, rev), name=f"{desk_name}_Subgraph")],
+    }
+
+
+def build_strategy_desk_subgraph():
+    """One compiled 2-node subgraph (`desk_quant_modeler -> desk_head_pm`) shared by all four desks.
+
+    The desk is chosen by `desk_name` in the `Send()` payload, so a revision round re-runs only the flagged desks.
+    """
+    sub = StateGraph(DeskState, input_schema=DeskInput, output_schema=DeskOutput)
     sub.add_node("desk_quant_modeler", desk_quant_modeler_node)
     sub.add_node("desk_head_pm", desk_head_pm_node)
     sub.add_edge(START, "desk_quant_modeler")
@@ -748,11 +760,7 @@ def create_strategy_desk_subgraph(
     return sub.compile()
 
 
-# Compile the 4 Strategy Desk Subgraphs
-momentum_desk_subgraph = create_strategy_desk_subgraph("MOMENTUM_DESK")
-stat_arb_desk_subgraph = create_strategy_desk_subgraph("STAT_ARB_DESK")
-macro_vol_desk_subgraph = create_strategy_desk_subgraph("MACRO_VOL_DESK")
-event_arb_desk_subgraph = create_strategy_desk_subgraph("EVENT_ARB_DESK")
+strategy_desk_subgraph = build_strategy_desk_subgraph()
 
 
 # ============================================================================
@@ -760,13 +768,14 @@ event_arb_desk_subgraph = create_strategy_desk_subgraph("EVENT_ARB_DESK")
 # ============================================================================
 
 def _collect_all_proposed_legs(state: TradingDeskState) -> list[dict[str, Any]]:
+    """Flatten every desk's legs into the plain dicts the deterministic risk-engine tool takes."""
     desks = state.get("desk_proposals") or {}
-    all_legs: list[dict[str, Any]] = []
-    for d_name in ALL_DESKS:
-        d_book = desks.get(d_name) or {}
-        for leg in d_book.get("proposed_legs", []):
-            all_legs.append(leg)
-    return all_legs
+    return [
+        leg.model_dump()
+        for d_name in ALL_DESKS
+        if d_name in desks
+        for leg in desks[d_name].proposed_legs
+    ]
 
 
 def factor_exposure_auditor_node(state: TradingDeskState) -> dict[str, Any]:
@@ -792,12 +801,7 @@ def factor_exposure_auditor_node(state: TradingDeskState) -> dict[str, Any]:
     audit.post_trade_net_pct_nav = quant_eval["post_trade_firm_net_pct_nav"]
     audit.net_beta_spy_equivalent_usd = quant_eval["net_beta_adjusted_exposure_usd"]
 
-    return {
-        "risk_sub_reports": {
-            "factor_audit": audit.model_dump(),
-            "raw_quant_eval": quant_eval,
-        },
-    }
+    return {"risk_sub_reports": {"factor_audit": audit}}
 
 
 def tail_var_monte_carlo_node(state: TradingDeskState) -> dict[str, Any]:
@@ -823,11 +827,7 @@ def tail_var_monte_carlo_node(state: TradingDeskState) -> dict[str, Any]:
     mc_report.expected_shortfall_cvar_99_usd = quant_eval["expected_shortfall_cvar_99_usd"]
     mc_report.stressed_regime_var_usd = quant_eval["stressed_var_99_usd"]
 
-    return {
-        "risk_sub_reports": {
-            "tail_var_mc": mc_report.model_dump(),
-        },
-    }
+    return {"risk_sub_reports": {"tail_var_mc": mc_report}}
 
 
 def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
@@ -846,8 +846,8 @@ def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
     risk_evidence_str = (
         f"Revision Round: {rev} of max {max_rev}\n"
         f"Firm Mandate & Live Alpaca Paper Account:\n{json.dumps(firm_mandate, indent=2)}\n\n"
-        f"Factor Exposure Audit:\n{json.dumps(sub_reports.get('factor_audit'), indent=2)}\n\n"
-        f"Tail-VaR & Monte Carlo Stress Report:\n{json.dumps(sub_reports.get('tail_var_mc'), indent=2)}\n\n"
+        f"Factor Exposure Audit:\n{_json(sub_reports.get('factor_audit'))}\n\n"
+        f"Tail-VaR & Monte Carlo Stress Report:\n{_json(sub_reports.get('tail_var_mc'))}\n\n"
         f"Deterministic Quantitative Risk Engine:\n{json.dumps(quant_eval, indent=2)}"
     )
 
@@ -879,14 +879,18 @@ def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
         for k, v in quant_eval["desk_specific_directives"].items()
     ]
 
+    # The deterministic engine decides the gate; the LLM's own `status` is never trusted.
+    # Fail closed: breaches that survive the last revision round are REJECTED, not waved through.
     if quant_eval["all_checks_passed"]:
         report.status = "APPROVED"
         report.limit_breaches = []
-        report.desk_directives = quant_directives
     elif rev < max_rev:
         report.status = "REVISE_DESKS"
         report.limit_breaches = quant_eval["limit_breaches"]
-        report.desk_directives = quant_directives
+    else:
+        report.status = "REJECTED"
+        report.limit_breaches = quant_eval["limit_breaches"]
+    report.desk_directives = quant_directives
 
     report.combined_gross_exposure_pct_nav = quant_eval["post_trade_firm_gross_pct_nav"]
     report.combined_net_exposure_pct_nav = quant_eval["post_trade_firm_net_pct_nav"]
@@ -929,32 +933,45 @@ def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
     )
 
     next_rev = rev + 1 if report.status == "REVISE_DESKS" else rev
-    rep_dict = report.model_dump()
-    rep_dict["openai_decisions_api"] = dec_ans
+    report.openai_decisions_api = dec_ans
     return {
-        "risk_assessment": rep_dict,
+        "risk_assessment": report,
         "revision_count": next_rev,
         "messages": [AIMessage(content=msg, name="CRO_Risk_Synthesis")],
     }
 
 
-def route_after_cro_synthesis(state: TradingDeskState) -> list[str] | str:
-    """Selective Desk Re-Dispatch: route ONLY to the specific Strategy Desk Subgraphs flagged with `must_revise=True`."""
-    risk = state.get("risk_assessment") or {}
-    status = risk.get("status", "APPROVED")
+def route_after_cro_synthesis(state: TradingDeskState) -> list[Send] | str:
+    """Gate after the CRO. Only an explicit APPROVED reaches the Head of Trading; anything else fails closed.
+
+    REVISE_DESKS re-dispatches ONLY the desks flagged with `must_revise=True`.
+    """
+    risk = state.get("risk_assessment")
     rev = state.get("revision_count") or 0
     max_rev = state.get("max_revisions") or 2
 
-    if status == "REVISE_DESKS" and rev <= max_rev:
-        flagged_nodes = [
-            DESK_TO_NODE[d["desk_name"]]
-            for d in risk.get("desk_directives", [])
-            if isinstance(d, dict) and d.get("must_revise") and d.get("desk_name") in DESK_TO_NODE
-        ]
-        if flagged_nodes:
-            return flagged_nodes
-        return list(DESK_TO_NODE.values())
-    return "head_of_trading"
+    if risk is None:
+        return "halt_no_trade"
+    if risk.status == "APPROVED":
+        return "head_of_trading"
+    if risk.status == "REVISE_DESKS" and rev <= max_rev:
+        flagged = [d.desk_name for d in risk.desk_directives if d.must_revise] or ALL_DESKS
+        return [Send(DESK_NODE, _desk_input(state, desk)) for desk in flagged]
+    return "halt_no_trade"
+
+
+def halt_no_trade_node(state: TradingDeskState) -> dict[str, Any]:
+    """Terminal node for a CRO REJECTED verdict: nothing is released to the Head of Trading or the EMS router."""
+    risk = state.get("risk_assessment")
+    breaches = risk.limit_breaches if risk else ["No CRO risk assessment was produced."]
+    breaches_md = "\n".join(f"  - ❌ {b}" for b in breaches)
+    msg = (
+        f"### 🛑 Trading Halted — CRO Risk Gate `{risk.status if risk else 'MISSING'}`\n"
+        f"- **Revision Rounds Used**: `{state.get('revision_count') or 0}` of max `{state.get('max_revisions') or 2}`\n"
+        f"- **Unresolved Breaches**:\n{breaches_md}\n"
+        "- **Outcome**: No parent tickets were released to the Head of Trading and no orders were staged."
+    )
+    return {"messages": [AIMessage(content=msg, name="CRO_Trading_Halt")]}
 
 
 # ============================================================================
@@ -972,40 +989,39 @@ def head_of_trading_node(state: TradingDeskState) -> dict[str, Any]:
             HumanMessage(
                 content=(
                     f"Completed Revision Rounds: {state.get('revision_count')}\n\n"
-                    f"Adversarial Debate Resolution:\n{json.dumps((state.get('adversarial_debate') or {}).get('resolution'), indent=2)}\n\n"
-                    f"4 Strategy Desk Subgraph Proposals:\n{json.dumps(state.get('desk_proposals'), indent=2)}\n\n"
-                    f"CRO Risk Committee Report:\n{json.dumps(state.get('risk_assessment'), indent=2)}\n\n"
+                    f"Adversarial Debate Resolution:\n{_json((state.get('adversarial_debate') or {}).get('resolution'))}\n\n"
+                    f"4 Strategy Desk Subgraph Proposals:\n{_json(state.get('desk_proposals'))}\n\n"
+                    f"CRO Risk Committee Report:\n{_json(state.get('risk_assessment'))}\n\n"
                     "Produce the master `HeadOfTradingDecision`."
                 )
             ),
         ]
     )
 
-    risk_status = (state.get("risk_assessment") or {}).get("status", "APPROVED")
-    if risk_status == "APPROVED" and not decision.execution_blotter:
+    # Routing only sends APPROVED books here (see `route_after_cro_synthesis`).
+    if not decision.execution_blotter:
         # Ensure all CRO-approved desk legs are staged as parent tickets for the EMS router
         desks = state.get("desk_proposals") or {}
         tickets: list[ApprovedExecutionTicket] = []
         allocs: list[DeskCapitalAllocation] = []
         for d_name in ALL_DESKS:
-            d_book = desks.get(d_name) or {}
+            book = desks.get(d_name)
+            legs = book.proposed_legs if book else []
             d_gross = 0.0
             d_net = 0.0
-            for leg in d_book.get("proposed_legs", []):
-                notional = float(leg.get("notional_usd", 0.0))
-                direction = str(leg.get("direction", "LONG")).upper()
-                d_gross += abs(notional)
-                d_net += notional if direction == "LONG" else -notional
+            for leg in legs:
+                d_gross += abs(leg.notional_usd)
+                d_net += leg.notional_usd if leg.direction == "LONG" else -leg.notional_usd
                 tickets.append(
                     ApprovedExecutionTicket(
                         desk=d_name,
-                        ticker=str(leg.get("ticker", "NVDA")),
-                        direction=direction,  # type: ignore[arg-type]
-                        instrument=str(leg.get("instrument", "EQUITY")),
-                        approved_notional_usd=notional,
-                        limit_or_entry_price=float(leg.get("entry_price", 100.0)),
-                        target_price=float(leg.get("target_price", 110.0)),
-                        stop_loss=float(leg.get("stop_loss", 94.0)),
+                        ticker=leg.ticker,
+                        direction=leg.direction,
+                        instrument=leg.instrument,
+                        approved_notional_usd=leg.notional_usd,
+                        limit_or_entry_price=leg.entry_price,
+                        target_price=leg.target_price,
+                        stop_loss=leg.stop_loss,
                         algo_routing="EMS_PENDING_DECISIONS_API",
                     )
                 )
@@ -1044,7 +1060,7 @@ def head_of_trading_node(state: TradingDeskState) -> dict[str, Any]:
     )
 
     return {
-        "head_of_trading_decision": decision.model_dump(),
+        "head_of_trading_decision": decision,
         "messages": [AIMessage(content=msg, name="Head_Of_Trading")],
     }
 
@@ -1054,19 +1070,17 @@ def execution_microstructure_router_node(state: TradingDeskState) -> dict[str, A
     llm = _get_llm()
     structured_llm = llm.with_structured_output(ExecutionMicrostructurePlan)
 
-    hot_decision = state.get("head_of_trading_decision") or {}
-    premarket_intel = (state.get("intel_reports") or {}).get("premarket") or {}
+    hot_decision = state.get("head_of_trading_decision")
+    premarket_intel = (state.get("intel_reports") or {}).get("premarket")
     dossiers = state.get("ticker_dossiers") or {}
+    blotter = hot_decision.execution_blotter if hot_decision else []
 
-    blotter_tickers = [
-        str(t.get("ticker", "NVDA"))
-        for t in (hot_decision.get("execution_blotter") or [])
-    ] or _extract_focus_tickers(state)
+    blotter_tickers = [t.ticker for t in blotter] or _extract_focus_tickers(state)
 
     ems_evidence = (
-        f"Head of Trading Parent Execution Blotter:\n{json.dumps(hot_decision, indent=2)}\n\n"
-        f"Databento L1 Orderbook Microstructure & Pre-Market Telemetry:\n{json.dumps(premarket_intel, indent=2)}\n\n"
-        f"Ticker Dossiers (OBI & ATR):\n{json.dumps(dossiers, indent=2)}"
+        f"Head of Trading Parent Execution Blotter:\n{_json(hot_decision)}\n\n"
+        f"Databento L1 Orderbook Microstructure & Pre-Market Telemetry:\n{_json(premarket_intel)}\n\n"
+        f"Ticker Dossiers (OBI & ATR):\n{_json(dossiers)}"
     )
 
     # Call OpenAI Decisions API (client.decisions.create with gpt-6-luna) for batched EMS algorithm & toxicity classification
@@ -1090,27 +1104,26 @@ def execution_microstructure_router_node(state: TradingDeskState) -> dict[str, A
         ]
     )
 
-    if not plan.child_order_schedules and hot_decision.get("execution_blotter"):
+    if not plan.child_order_schedules and blotter:
         # Populate deterministic child order schedules using the OpenAI Decisions API EMS choices
-        from trading_desk.state import ChildOrderSliceSchedule
         schedules = []
         total_tca = 0.0
-        for t in hot_decision.get("execution_blotter", []):
-            sym = str(t.get("ticker", "NVDA")).upper().strip()
-            notional = float(t.get("approved_notional_usd", 0.0))
-            px = max(float(t.get("limit_or_entry_price", 100.0)), 1.0)
+        for t in blotter:
+            sym = t.ticker.upper().strip()
+            notional = t.approved_notional_usd
+            px = max(t.limit_or_entry_price, 1.0)
             shs = max(int(round(notional / px)), 100)
             dec_algo = ems_ans.get(f"{sym}_ems_algo", {}).get("choice") or "DARK_MIDPOINT_PEG_IEX_DLIMIT"
             tox_prob = float(ems_ans.get(f"{sym}_adverse_selection_toxicity", {}).get("probability", 0.5))
             slip_bps = round(6.0 + 10.0 * tox_prob, 1)
             total_tca += notional * (slip_bps / 10_000.0)
-            side = "buy" if str(t.get("direction", "LONG")).upper() == "LONG" else "sell"
+            side = "buy" if t.direction == "LONG" else "sell"
             schedules.append(
                 ChildOrderSliceSchedule(
-                    parent_desk=str(t.get("desk", "MOMENTUM_DESK")),
+                    parent_desk=t.desk,
                     ticker=sym,
-                    direction=str(t.get("direction", "LONG")),
-                    instrument=str(t.get("instrument", "EQUITY")),
+                    direction=t.direction,
+                    instrument=t.instrument,
                     total_notional_usd=notional,
                     estimated_shares_or_contracts=shs,
                     selected_ems_algo=dec_algo,
@@ -1160,10 +1173,9 @@ def execution_microstructure_router_node(state: TradingDeskState) -> dict[str, A
         + f"\n- **EMS Execution Desk Commentary**: {plan.ems_execution_commentary}"
     )
 
-    plan_dict = plan.model_dump()
-    plan_dict["openai_decisions_api"] = ems_ans
+    plan.openai_decisions_api = ems_ans
     return {
-        "execution_microstructure_plan": plan_dict,
+        "execution_microstructure_plan": plan,
         "messages": [AIMessage(content=msg, name="Execution_Microstructure_EMS_Router")],
     }
 
@@ -1172,7 +1184,7 @@ def execution_microstructure_router_node(state: TradingDeskState) -> dict[str, A
 # MASTER 24-NODE HIERARCHICAL GRAPH BUILDER
 # ============================================================================
 
-def build_trading_desk_graph():
+def build_trading_desk_graph(checkpointer=None):
     """Compile the 24-Node Hierarchical Multi-Strategy Hedge Fund StateGraph."""
     builder = StateGraph(TradingDeskState)
 
@@ -1194,16 +1206,14 @@ def build_trading_desk_graph():
     builder.add_node("bear_thesis_critic", bear_thesis_critic_node)
     builder.add_node("adversarial_debate_arbiter", adversarial_debate_arbiter_node)
 
-    # Tier 3: 4 Parallel Multi-Agent Strategy Desk Subgraphs (2 internal nodes each = 8 subgraph nodes)
-    builder.add_node("momentum_desk_subgraph", momentum_desk_subgraph)
-    builder.add_node("stat_arb_desk_subgraph", stat_arb_desk_subgraph)
-    builder.add_node("macro_vol_desk_subgraph", macro_vol_desk_subgraph)
-    builder.add_node("event_arb_desk_subgraph", event_arb_desk_subgraph)
+    # Tier 3: one 2-node Strategy Desk subgraph, run once per desk via Send() (4 parallel runs per round)
+    builder.add_node(DESK_NODE, strategy_desk_subgraph)
 
     # Tier 4: Triad Risk & Exposure Committee (2 Parallel Risk Auditors -> CRO Synthesis)
     builder.add_node("factor_exposure_auditor", factor_exposure_auditor_node)
     builder.add_node("tail_var_monte_carlo", tail_var_monte_carlo_node)
     builder.add_node("cro_risk_synthesis", cro_risk_synthesis_node)
+    builder.add_node("halt_no_trade", halt_no_trade_node)
 
     # Tier 5: Global Head of Trading -> Quantitative Execution & Microstructure EMS Router
     builder.add_node("head_of_trading", head_of_trading_node)
@@ -1242,39 +1252,30 @@ def build_trading_desk_graph():
     builder.add_edge("bull_thesis_advocate", "adversarial_debate_arbiter")
     builder.add_edge("bear_thesis_critic", "adversarial_debate_arbiter")
 
-    # 4. Debate Arbiter fans out to all 4 Strategy Desk Subgraphs in parallel
-    builder.add_edge("adversarial_debate_arbiter", "momentum_desk_subgraph")
-    builder.add_edge("adversarial_debate_arbiter", "stat_arb_desk_subgraph")
-    builder.add_edge("adversarial_debate_arbiter", "macro_vol_desk_subgraph")
-    builder.add_edge("adversarial_debate_arbiter", "event_arb_desk_subgraph")
+    # 4. Debate Arbiter dispatches one Send() per desk into the shared Strategy Desk subgraph
+    builder.add_conditional_edges("adversarial_debate_arbiter", dispatch_strategy_desks, [DESK_NODE])
 
-    # 5. All 4 Strategy Desk Subgraphs feed into the 2 Parallel Risk Auditors
-    for desk_node in DESK_TO_NODE.values():
-        builder.add_edge(desk_node, "factor_exposure_auditor")
-        builder.add_edge(desk_node, "tail_var_monte_carlo")
+    # 5. The desk runs feed into the 2 Parallel Risk Auditors
+    builder.add_edge(DESK_NODE, "factor_exposure_auditor")
+    builder.add_edge(DESK_NODE, "tail_var_monte_carlo")
 
     # 6. Parallel Risk Auditors converge at CRO Risk Synthesis
     builder.add_edge("factor_exposure_auditor", "cro_risk_synthesis")
     builder.add_edge("tail_var_monte_carlo", "cro_risk_synthesis")
 
-    # 7. Conditional Selective Desk Re-Dispatch Loop or advance to Head of Trading
+    # 7. CRO gate: selective desk re-dispatch, approval to the Head of Trading, or a fail-closed halt
     builder.add_conditional_edges(
         "cro_risk_synthesis",
         route_after_cro_synthesis,
-        [
-            "momentum_desk_subgraph",
-            "stat_arb_desk_subgraph",
-            "macro_vol_desk_subgraph",
-            "event_arb_desk_subgraph",
-            "head_of_trading",
-        ],
+        [DESK_NODE, "head_of_trading", "halt_no_trade"],
     )
+    builder.add_edge("halt_no_trade", END)
 
     # 8. Head of Trading -> Execution Microstructure EMS Router -> END
     builder.add_edge("head_of_trading", "execution_microstructure_router")
     builder.add_edge("execution_microstructure_router", END)
 
-    return builder.compile()
+    return builder.compile(checkpointer=checkpointer)
 
 
 graph = build_trading_desk_graph()

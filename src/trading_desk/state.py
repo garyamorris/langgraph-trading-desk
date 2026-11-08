@@ -5,6 +5,7 @@ from __future__ import annotations
 import operator
 from typing import Annotated, Any, Literal
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 from langchain_core.messages import AnyMessage
 from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
@@ -155,6 +156,8 @@ class TickerDeepResearchDossier(BaseModel):
     suggested_target: float = Field(description="Suggested target price")
     suggested_stop_within_7pct: float = Field(description="Hard stop-loss strictly within 7.0% of entry")
     synthesis_note: str = Field(description="Concise synthesis of tape, technicals, news, and microstructure for this ticker")
+    # Filled in by the graph (never by the LLM): hidden from the structured-output JSON schema.
+    openai_decisions_api: SkipJsonSchema[dict[str, Any]] = Field(default_factory=dict)
 
 
 # ============================================================================
@@ -182,6 +185,7 @@ class AdversarialDebateResolution(BaseModel):
         description="Recommended capital weightings across MOMENTUM_DESK, STAT_ARB_DESK, MACRO_VOL_DESK, EVENT_ARB_DESK"
     )
     cio_synthesis_memo: str = Field(description="Authoritative synthesis guiding the 4 Strategy Desk Subgraphs")
+    openai_decisions_api: SkipJsonSchema[dict[str, Any]] = Field(default_factory=dict)
 
 
 # ============================================================================
@@ -289,6 +293,7 @@ class PortfolioRiskReport(BaseModel):
         description="Directives per desk with must_revise flag for selective Send() re-dispatch",
     )
     cro_commentary: str = Field(description="Executive CRO synthesis of Factor Audit and Monte Carlo Tail Stress")
+    openai_decisions_api: SkipJsonSchema[dict[str, Any]] = Field(default_factory=dict)
 
 
 # ============================================================================
@@ -365,6 +370,7 @@ class ExecutionMicrostructurePlan(BaseModel):
     ems_execution_commentary: str = Field(
         description="Execution Desk Head's commentary on Databento L1 spread capture, dark pool toxicity avoidance, and order staging"
     )
+    openai_decisions_api: SkipJsonSchema[dict[str, Any]] = Field(default_factory=dict)
 
 
 # ============================================================================
@@ -377,42 +383,52 @@ class TickerWorkerState(TypedDict):
     ticker: str
 
 
-class DeskSubgraphState(TypedDict):
-    """State schema for a Strategy Desk Subgraph so only desk outputs are written back to the parent graph."""
+DeskName = Literal["MOMENTUM_DESK", "STAT_ARB_DESK", "MACRO_VOL_DESK", "EVENT_ARB_DESK"]
 
-    focus_tickers: list[str]
-    cio_mandate: dict[str, Any] | None
-    intel_reports: dict[str, Any]
-    ticker_dossiers: dict[str, Any]
-    adversarial_debate: dict[str, Any]
-    desk_quant_Drafts: Annotated[dict[str, Any], merge_dicts]
-    desk_proposals: Annotated[dict[str, Any], merge_dicts]
-    risk_assessment: dict[str, Any] | None
+
+class DeskInput(TypedDict):
+    """Payload the parent sends (via `Send`) to the desk subgraph: everything one desk needs, nothing else."""
+
+    desk_name: DeskName
     revision_count: int
-    max_revisions: int
+    context: str  # prompt context prebuilt by the parent from its own state
 
 
+class DeskOutput(TypedDict):
+    """What the desk subgraph hands back to the parent (reducers live on the parent's channels)."""
+
+    desk_proposals: dict[str, DeskMandateProposal]
+    messages: list[AnyMessage]
+
+
+class DeskState(DeskInput):
+    """Private working state of the desk subgraph; `quant_draft` never leaves it."""
+
+    quant_draft: DeskQuantModelOutput | None
+
+
+# Values in the dict channels are Pydantic models, not dumped dicts. Reducer channels are only
+# those where parallel branches write to the same key; everything else is a plain last-value channel.
 class TradingDeskState(TypedDict):
     """Shared state across the 24-node Hierarchical Multi-Strategy Hedge Fund graph."""
 
     messages: Annotated[list[AnyMessage], add_messages]
     focus_tickers: list[str]
     # Tier 0: CIO Mandate
-    cio_mandate: dict[str, Any] | None
-    # Tier 1: Parallel Intelligence Syndicate + Dynamic Send() Ticker Dossiers
-    intel_reports: Annotated[dict[str, Any], merge_dicts]
-    ticker_dossiers: Annotated[dict[str, Any], merge_dicts]
-    # Tier 2: Adversarial Bull / Bear / CIO Debate
-    adversarial_debate: Annotated[dict[str, Any], merge_dicts]
-    # Tier 3: 4 Parallel Multi-Agent Strategy Desk Subgraphs
-    desk_quant_Drafts: Annotated[dict[str, Any], merge_dicts]
-    desk_proposals: Annotated[dict[str, Any], merge_dicts]
-    # Tier 4: Triad Risk & Exposure Committee
-    risk_sub_reports: Annotated[dict[str, Any], merge_dicts]
-    risk_assessment: dict[str, Any] | None
+    cio_mandate: CIORegimeMandate | None
+    # Tier 1: Parallel Intelligence Syndicate (keyed by analyst) + Send() ticker dossiers (keyed by ticker)
+    intel_reports: Annotated[dict[str, BaseModel], merge_dicts]
+    ticker_dossiers: Annotated[dict[str, TickerDeepResearchDossier], merge_dicts]
+    # Tier 2: Adversarial Bull / Bear / CIO Debate (keys: bull_case, bear_case, resolution)
+    adversarial_debate: Annotated[dict[str, BaseModel], merge_dicts]
+    # Tier 3: one entry per strategy desk, written by the desk subgraph
+    desk_proposals: Annotated[dict[str, DeskMandateProposal], merge_dicts]
+    # Tier 4: Triad Risk & Exposure Committee (keys: factor_audit, tail_var_mc)
+    risk_sub_reports: Annotated[dict[str, BaseModel], merge_dicts]
+    risk_assessment: PortfolioRiskReport | None
     # Tier 5: Head of Trading & Execution Microstructure EMS Router
-    head_of_trading_decision: dict[str, Any] | None
-    execution_microstructure_plan: dict[str, Any] | None
+    head_of_trading_decision: HeadOfTradingDecision | None
+    execution_microstructure_plan: ExecutionMicrostructurePlan | None
     # Iterative Loop Controls
     revision_count: int
     max_revisions: int
