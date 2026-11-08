@@ -1,0 +1,15 @@
+bin/
+work/
+raw/
+viz_out/
+fcdata/
+fc.out
+out_final*
+frames_*/
+mp4frames_*/
+*.fcproj
+*.plan.json
+narration/cache/
+narration/samples/
+narration/audio/
+out/

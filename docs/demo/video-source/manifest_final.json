@@ -1,0 +1,912 @@
+{
+ "width": 1920,
+ "height": 1080,
+ "fps": 30,
+ "narration_dir": "narration/audio",
+ "preset": "Match Source \u2013 Adaptive Low Bitrate",
+ "max_mb": 60,
+ "audio_kbps": 128,
+ "small": {
+  "width": 1280,
+  "height": 720,
+  "max_mb": 28,
+  "audio_kbps": 96
+ },
+ "xfade": 0.35,
+ "narration_db": -3.0,
+ "title": {
+  "text": "trading_desk",
+  "sub": "how a LangGraph hedge-fund desk runs, from a real recorded run",
+  "seconds": 3.5,
+  "bg": {
+   "type": "video",
+   "path": "raw/run.mp4",
+   "in": 252.23,
+   "freeze": true,
+   "move": "none"
+  },
+  "dim": -90
+ },
+ "outro": {
+  "text": "Run it yourself",
+  "sub": "uv run langgraph dev  \u00b7  paper data, not trading advice",
+  "seconds": 3.5,
+  "bg": {
+   "type": "video",
+   "path": "raw/run.mp4",
+   "in": 255.25,
+   "freeze": true,
+   "move": "none"
+  },
+  "dim": -90
+ },
+ "scenes": [
+  {
+   "id": "A",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/tour_a.mp4",
+     "in": 0,
+     "out": 19.0,
+     "speed": "fit"
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 1.92,
+     "text": "This is a hedge fund trading desk,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 2.34,
+     "dur": 2.3,
+     "text": "built as a single LangGraph:",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 4.66,
+     "dur": 2.26,
+     "text": "nineteen nodes, with six analysts,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 7.3,
+     "dur": 0.9,
+     "text": "a bull and a bear,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 8.58,
+     "dur": 1.12,
+     "text": "four strategy desks,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 9.94,
+     "dur": 2.32,
+     "text": "a risk committee, and an execution router.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 12.7,
+     "dur": 1.88,
+     "text": "Everything you are about to see is a real",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 14.6,
+     "dur": 2.12,
+     "text": "run, recorded against the live graph",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 16.74,
+     "dur": 1.18,
+     "text": "with real models.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "B",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/state_b.mp4",
+     "in": 0,
+     "out": 21.1,
+     "speed": "fit"
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 1.62,
+     "text": "Nodes never call each other.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 2.46,
+     "dur": 1.54,
+     "text": "They share one typed state,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 4.24,
+     "dur": 0.94,
+     "text": "thirteen channels.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 5.68,
+     "dur": 1.34,
+     "text": "Each node reads what it needs",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 7.04,
+     "dur": 2.28,
+     "text": "and returns only the keys it changed.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 9.78,
+     "dur": 1.8,
+     "text": "When parallel branches write to the same",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 11.6,
+     "dur": 2.14,
+     "text": "channel, a reducer decides how to combine",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 13.76,
+     "dur": 3.16,
+     "text": "them: five channels here merge dictionaries,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 17.3,
+     "dur": 2.56,
+     "text": "so six analysts can write at once without",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 19.88,
+     "dur": 1.1,
+     "text": "overwriting each other.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "C",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 1.72,
+     "out": 14.02,
+     "speed": "fit",
+     "weight": 0.4
+    },
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 14.02,
+     "out": 54.04,
+     "speed": "fit",
+     "weight": 0.25
+    },
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 54.04,
+     "out": 62.97,
+     "speed": "fit",
+     "weight": 0.35
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 2.74,
+     "text": "The run starts at the CIO router,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 3.28,
+     "dur": 1.68,
+     "text": "which fans out in two ways.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 5.58,
+     "dur": 1.44,
+     "text": "Six analysts start at once.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 7.48,
+     "dur": 2.4,
+     "text": "And a Send call spawns one deep research",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 9.9,
+     "dur": 1.04,
+     "text": "worker per ticker:",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 11.34,
+     "dur": 0.98,
+     "text": "the same function,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 12.84,
+     "dur": 1.2,
+     "text": "mapped over six inputs.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 14.56,
+     "dur": 1.84,
+     "text": "They all run in one super-step,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 16.62,
+     "dur": 1.8,
+     "text": "so the aggregator fires only",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 18.44,
+     "dur": 1.58,
+     "text": "when the slowest branch lands,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 20.42,
+     "dur": 2.24,
+     "text": "and the reducers have merged twelve parallel",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 22.68,
+     "dur": 1.18,
+     "text": "writes into the state.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "D",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 60.97,
+     "out": 96.27,
+     "speed": "fit"
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 2.1,
+     "text": "The aggregator feeds two nodes",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 2.52,
+     "dur": 1.12,
+     "text": "that run in parallel:",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 4.06,
+     "dur": 1.98,
+     "text": "a bull advocate and a bear critic,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 6.28,
+     "dur": 1.0,
+     "text": "reading the same state",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 7.3,
+     "dur": 1.84,
+     "text": "and arguing opposing cases.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 9.58,
+     "dur": 1.88,
+     "text": "Then the arbiter rules.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 12.02,
+     "dur": 2.22,
+     "text": "In this run it settled on market neutral",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 14.26,
+     "dur": 1.94,
+     "text": "dispersion, and split the capital:",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 16.76,
+     "dur": 3.02,
+     "text": "15% momentum, 35% stat arb,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 20.18,
+     "dur": 3.22,
+     "text": "30% macro vol, 20% event arb.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "E",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 95.27,
+     "out": 128.93,
+     "speed": "fit"
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 1.64,
+     "text": "Next, the desks.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 2.62,
+     "dur": 2.62,
+     "text": "The arbiter returns one Send per desk,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 5.66,
+     "dur": 1.88,
+     "text": "but there is only one desk subgraph,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 8.24,
+     "dur": 1.36,
+     "text": "compiled once with its own input",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 9.62,
+     "dur": 1.14,
+     "text": "and output schemas,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 10.96,
+     "dur": 2.0,
+     "text": "and run four times in parallel.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 13.44,
+     "dur": 1.48,
+     "text": "A quant models the legs,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 15.28,
+     "dur": 1.46,
+     "text": "a desk head signs off,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 16.8,
+     "dur": 2.36,
+     "text": "and the quant's draft stays in a private channel.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 19.72,
+     "dur": 2.92,
+     "text": "Only the final proposal flows back to shared state.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "F",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 126.93,
+     "out": 145.65,
+     "speed": "fit"
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 1.08,
+     "text": "Now the gate.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 2.14,
+     "dur": 1.3,
+     "text": "Two auditors run in parallel,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 3.74,
+     "dur": 1.86,
+     "text": "and the chief risk officer reads them.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 5.92,
+     "dur": 1.7,
+     "text": "But the language model does not get the",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 7.64,
+     "dur": 2.28,
+     "text": "final say: a deterministic risk engine",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 9.94,
+     "dur": 2.1,
+     "text": "computes exposure and value at risk,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 12.06,
+     "dur": 1.74,
+     "text": "and its verdict is authoritative.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 14.3,
+     "dur": 1.64,
+     "text": "Here it flags the momentum desk:",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 16.2,
+     "dur": 2.04,
+     "text": "a TLT position of $14M,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 18.26,
+     "dur": 2.4,
+     "text": "against a $12M cap.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "G",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 143.15,
+     "out": 191.43,
+     "speed": "fit"
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 2.56,
+     "text": "The conditional edge returns the verdict",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 2.98,
+     "dur": 2.44,
+     "text": "revise, and the router sends only the",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 5.44,
+     "dur": 1.44,
+     "text": "offending desk around again,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 6.9,
+     "dur": 1.28,
+     "text": "with a fresh Send.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 8.72,
+     "dur": 1.3,
+     "text": "The revision counter moves",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 10.04,
+     "dur": 1.56,
+     "text": "from zero to one.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 12.28,
+     "dur": 2.6,
+     "text": "Momentum comes back with a book of $11.5M",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 14.9,
+     "dur": 2.26,
+     "text": "gross, the engine re-checks,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 17.42,
+     "dur": 1.48,
+     "text": "and this time it approves:",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 19.36,
+     "dur": 2.08,
+     "text": "about 98.5% gross,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 21.84,
+     "dur": 3.72,
+     "text": "9.5% net, value at risk under the limit.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "H",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/fail_h.mp4",
+     "in": 0,
+     "out": 16.45,
+     "speed": "fit"
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 2.16,
+     "text": "The loop is bounded to two rounds.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 3.16,
+     "dur": 1.4,
+     "text": "If breaches are still open after",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 4.58,
+     "dur": 2.54,
+     "text": "that, the graph does not approve by default:",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 7.7,
+     "dur": 2.36,
+     "text": "a rejected verdict routes to a halt node,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 10.26,
+     "dur": 1.96,
+     "text": "and the run ends with no trade.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 12.98,
+     "dur": 2.04,
+     "text": "That branch did not fire in this recording;",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 15.44,
+     "dur": 1.28,
+     "text": "the test suite covers it.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "I",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 190.73,
+     "out": 220.43,
+     "speed": "fit",
+     "weight": 0.5
+    },
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 239.63,
+     "out": 251.63,
+     "speed": "fit",
+     "weight": 0.5
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 2.68,
+     "text": "Approved, so the head of trading releases",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 3.1,
+     "dur": 3.44,
+     "text": "the blotter: $25.2M gross,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 7.12,
+     "dur": 0.9,
+     "text": "scaled and hedged.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 8.3,
+     "dur": 2.28,
+     "text": "The execution router slices seven parent",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 10.6,
+     "dur": 1.22,
+     "text": "orders into child orders",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 11.84,
+     "dur": 1.22,
+     "text": "across dark pools,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 13.64,
+     "dur": 1.54,
+     "text": "IEX and lit venues,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 15.44,
+     "dur": 3.14,
+     "text": "with about $43k of estimated cost,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 18.84,
+     "dur": 1.46,
+     "text": "and the run reaches its end.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  },
+  {
+   "id": "K",
+   "segments": [
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 249.63,
+     "out": 255.25,
+     "speed": "fit",
+     "weight": 1.0
+    },
+    {
+     "type": "video",
+     "path": "raw/run.mp4",
+     "in": 255.25,
+     "freeze": true,
+     "move": "none",
+     "weight": 1.2
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.4,
+     "dur": 2.46,
+     "text": "One shared state, parallel fan-outs,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 3.3,
+     "dur": 1.86,
+     "text": "a subgraph reused four times,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 5.58,
+     "dur": 1.96,
+     "text": "a deterministic gate with a bounded loop,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 7.88,
+     "dur": 1.26,
+     "text": "and a fail-closed exit.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 9.86,
+     "dur": 1.02,
+     "text": "Run it with langgraph dev",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 10.9,
+     "dur": 1.44,
+     "text": "and watch it in Studio.",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 12.88,
+     "dur": 1.6,
+     "text": "It is a demo on paper data,",
+     "style": "caption",
+     "anchor": "bc"
+    },
+    {
+     "at": 14.78,
+     "dur": 1.4,
+     "text": "and it is not trading advice.",
+     "style": "caption",
+     "anchor": "bc"
+    }
+   ],
+   "pad_before": 0.4,
+   "pad_after": 0.6
+  }
+ ]
+}

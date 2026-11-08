@@ -1,0 +1,384 @@
+1
+00:00:03,900 --> 00:00:05,820
+This is a hedge fund trading desk,
+
+2
+00:00:05,840 --> 00:00:08,140
+built as a single LangGraph:
+
+3
+00:00:08,160 --> 00:00:10,420
+nineteen nodes, with six analysts,
+
+4
+00:00:10,800 --> 00:00:11,700
+a bull and a bear,
+
+5
+00:00:12,080 --> 00:00:13,200
+four strategy desks,
+
+6
+00:00:13,440 --> 00:00:15,760
+a risk committee, and an execution router.
+
+7
+00:00:16,200 --> 00:00:18,080
+Everything you are about to see is a real
+
+8
+00:00:18,100 --> 00:00:20,220
+run, recorded against the live graph
+
+9
+00:00:20,240 --> 00:00:21,420
+with real models.
+
+10
+00:00:22,500 --> 00:00:24,120
+Nodes never call each other.
+
+11
+00:00:24,560 --> 00:00:26,100
+They share one typed state,
+
+12
+00:00:26,340 --> 00:00:27,280
+thirteen channels.
+
+13
+00:00:27,780 --> 00:00:29,120
+Each node reads what it needs
+
+14
+00:00:29,140 --> 00:00:31,420
+and returns only the keys it changed.
+
+15
+00:00:31,880 --> 00:00:33,680
+When parallel branches write to the same
+
+16
+00:00:33,700 --> 00:00:35,840
+channel, a reducer decides how to combine
+
+17
+00:00:35,860 --> 00:00:39,020
+them: five channels here merge dictionaries,
+
+18
+00:00:39,400 --> 00:00:41,960
+so six analysts can write at once without
+
+19
+00:00:41,980 --> 00:00:43,080
+overwriting each other.
+
+20
+00:00:44,100 --> 00:00:46,840
+The run starts at the CIO router,
+
+21
+00:00:46,980 --> 00:00:48,660
+which fans out in two ways.
+
+22
+00:00:49,280 --> 00:00:50,720
+Six analysts start at once.
+
+23
+00:00:51,180 --> 00:00:53,580
+And a Send call spawns one deep research
+
+24
+00:00:53,600 --> 00:00:54,640
+worker per ticker:
+
+25
+00:00:55,040 --> 00:00:56,020
+the same function,
+
+26
+00:00:56,540 --> 00:00:57,740
+mapped over six inputs.
+
+27
+00:00:58,260 --> 00:01:00,100
+They all run in one super-step,
+
+28
+00:01:00,320 --> 00:01:02,120
+so the aggregator fires only
+
+29
+00:01:02,140 --> 00:01:03,720
+when the slowest branch lands,
+
+30
+00:01:04,120 --> 00:01:06,360
+and the reducers have merged twelve parallel
+
+31
+00:01:06,380 --> 00:01:07,560
+writes into the state.
+
+32
+00:01:08,700 --> 00:01:10,800
+The aggregator feeds two nodes
+
+33
+00:01:10,820 --> 00:01:11,940
+that run in parallel:
+
+34
+00:01:12,360 --> 00:01:14,340
+a bull advocate and a bear critic,
+
+35
+00:01:14,580 --> 00:01:15,580
+reading the same state
+
+36
+00:01:15,600 --> 00:01:17,440
+and arguing opposing cases.
+
+37
+00:01:17,880 --> 00:01:19,760
+Then the arbiter rules.
+
+38
+00:01:20,320 --> 00:01:22,540
+In this run it settled on market neutral
+
+39
+00:01:22,560 --> 00:01:24,500
+dispersion, and split the capital:
+
+40
+00:01:25,060 --> 00:01:28,080
+15% momentum, 35% stat arb,
+
+41
+00:01:28,480 --> 00:01:31,700
+30% macro vol, 20% event arb.
+
+42
+00:01:32,767 --> 00:01:34,407
+Next, the desks.
+
+43
+00:01:34,987 --> 00:01:37,607
+The arbiter returns one Send per desk,
+
+44
+00:01:38,027 --> 00:01:39,907
+but there is only one desk subgraph,
+
+45
+00:01:40,607 --> 00:01:41,967
+compiled once with its own input
+
+46
+00:01:41,987 --> 00:01:43,127
+and output schemas,
+
+47
+00:01:43,327 --> 00:01:45,327
+and run four times in parallel.
+
+48
+00:01:45,807 --> 00:01:47,287
+A quant models the legs,
+
+49
+00:01:47,647 --> 00:01:49,107
+a desk head signs off,
+
+50
+00:01:49,167 --> 00:01:51,527
+and the quant's draft stays in a private channel.
+
+51
+00:01:52,087 --> 00:01:55,007
+Only the final proposal flows back to shared state.
+
+52
+00:01:56,033 --> 00:01:57,113
+Now the gate.
+
+53
+00:01:57,773 --> 00:01:59,073
+Two auditors run in parallel,
+
+54
+00:01:59,373 --> 00:02:01,233
+and the chief risk officer reads them.
+
+55
+00:02:01,553 --> 00:02:03,253
+But the language model does not get the
+
+56
+00:02:03,273 --> 00:02:05,553
+final say: a deterministic risk engine
+
+57
+00:02:05,573 --> 00:02:07,673
+computes exposure and value at risk,
+
+58
+00:02:07,693 --> 00:02:09,433
+and its verdict is authoritative.
+
+59
+00:02:09,933 --> 00:02:11,573
+Here it flags the momentum desk:
+
+60
+00:02:11,833 --> 00:02:13,873
+a TLT position of $14M,
+
+61
+00:02:13,893 --> 00:02:16,293
+against a $12M cap.
+
+62
+00:02:17,433 --> 00:02:19,993
+The conditional edge returns the verdict
+
+63
+00:02:20,013 --> 00:02:22,453
+revise, and the router sends only the
+
+64
+00:02:22,473 --> 00:02:23,913
+offending desk around again,
+
+65
+00:02:23,933 --> 00:02:25,213
+with a fresh Send.
+
+66
+00:02:25,753 --> 00:02:27,053
+The revision counter moves
+
+67
+00:02:27,073 --> 00:02:28,633
+from zero to one.
+
+68
+00:02:29,313 --> 00:02:31,913
+Momentum comes back with a book of $11.5M
+
+69
+00:02:31,933 --> 00:02:34,193
+gross, the engine re-checks,
+
+70
+00:02:34,453 --> 00:02:35,933
+and this time it approves:
+
+71
+00:02:36,393 --> 00:02:38,473
+about 98.5% gross,
+
+72
+00:02:38,873 --> 00:02:42,593
+9.5% net, value at risk under the limit.
+
+73
+00:02:43,700 --> 00:02:45,860
+The loop is bounded to two rounds.
+
+74
+00:02:46,460 --> 00:02:47,860
+If breaches are still open after
+
+75
+00:02:47,880 --> 00:02:50,420
+that, the graph does not approve by default:
+
+76
+00:02:51,000 --> 00:02:53,360
+a rejected verdict routes to a halt node,
+
+77
+00:02:53,560 --> 00:02:55,520
+and the run ends with no trade.
+
+78
+00:02:56,280 --> 00:02:58,320
+That branch did not fire in this recording;
+
+79
+00:02:58,740 --> 00:03:00,020
+the test suite covers it.
+
+80
+00:03:00,967 --> 00:03:03,647
+Approved, so the head of trading releases
+
+81
+00:03:03,667 --> 00:03:07,107
+the blotter: $25.2M gross,
+
+82
+00:03:07,687 --> 00:03:08,587
+scaled and hedged.
+
+83
+00:03:08,867 --> 00:03:11,147
+The execution router slices seven parent
+
+84
+00:03:11,167 --> 00:03:12,387
+orders into child orders
+
+85
+00:03:12,407 --> 00:03:13,627
+across dark pools,
+
+86
+00:03:14,207 --> 00:03:15,747
+IEX and lit venues,
+
+87
+00:03:16,007 --> 00:03:19,147
+with about $43k of estimated cost,
+
+88
+00:03:19,407 --> 00:03:20,867
+and the run reaches its end.
+
+89
+00:03:22,033 --> 00:03:24,493
+One shared state, parallel fan-outs,
+
+90
+00:03:24,933 --> 00:03:26,793
+a subgraph reused four times,
+
+91
+00:03:27,213 --> 00:03:29,173
+a deterministic gate with a bounded loop,
+
+92
+00:03:29,513 --> 00:03:30,773
+and a fail-closed exit.
+
+93
+00:03:31,493 --> 00:03:32,513
+Run it with langgraph dev
+
+94
+00:03:32,533 --> 00:03:33,973
+and watch it in Studio.
+
+95
+00:03:34,513 --> 00:03:36,113
+It is a demo on paper data,
+
+96
+00:03:36,413 --> 00:03:37,813
+and it is not trading advice.
+

@@ -118,3 +118,9 @@ LLMs, market-data tools and Decisions-API calls are stubbed, so no keys, network
 ```bash
 uv run python -m unittest discover -s tests -v
 ```
+
+---
+
+## 🎬 Walkthrough Video
+
+[`docs/demo/video-source/`](docs/demo/video-source/README.md) holds everything needed to make a 3:40 narrated walkthrough of how this graph executes: a live-graph visualiser that animates the real LangGraph event stream (fan-out, reducers, the desk subgraph, the revision loop, the CRO gate), a recorder, a narration pipeline with a round-trip transcription check, and word-timed subtitles. Scenes C to G and I are a recording of one real run; scene H (the fail-closed branch) is labelled on screen as an illustration because that path did not fire. The rendered `.mp4`, `.srt`, `.vtt` and transcript are written to `docs/demo/`.

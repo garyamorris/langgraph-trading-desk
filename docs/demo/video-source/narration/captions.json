@@ -1,0 +1,3323 @@
+{
+ "A": {
+  "duration": 17.6,
+  "match": 0.9109,
+  "heard": "This is a hedge fund trading desk built as a single LangGraph, 19 nodes with 6 analysts, a bull and a bear, 4 strategy desks, a risk committee, and an execution router. Everything you are about to see is a real run, recorded against the live graph with real models.",
+  "problems": [
+   {
+    "said": "langgraph 19",
+    "expected": "lang graph nineteen"
+   },
+   {
+    "said": "6",
+    "expected": "six"
+   },
+   {
+    "said": "4",
+    "expected": "four"
+   }
+  ],
+  "tokens": [
+   [
+    "This",
+    0.0,
+    0.4
+   ],
+   [
+    "is",
+    0.4,
+    0.68
+   ],
+   [
+    "a",
+    0.68,
+    0.82
+   ],
+   [
+    "hedge",
+    0.82,
+    1.0
+   ],
+   [
+    "fund",
+    1.0,
+    1.22
+   ],
+   [
+    "trading",
+    1.22,
+    1.58
+   ],
+   [
+    "desk,",
+    1.58,
+    1.94
+   ],
+   [
+    "built",
+    1.94,
+    2.52
+   ],
+   [
+    "as",
+    2.52,
+    2.78
+   ],
+   [
+    "a",
+    2.78,
+    2.96
+   ],
+   [
+    "single",
+    2.96,
+    3.22
+   ],
+   [
+    "LangGraph:",
+    3.22,
+    4.26
+   ],
+   [
+    "nineteen",
+    4.26,
+    4.78
+   ],
+   [
+    "nodes,",
+    4.78,
+    5.14
+   ],
+   [
+    "with",
+    5.14,
+    5.64
+   ],
+   [
+    "six",
+    5.64,
+    5.96
+   ],
+   [
+    "analysts,",
+    5.96,
+    6.4
+   ],
+   [
+    "a",
+    6.9,
+    7.14
+   ],
+   [
+    "bull",
+    7.14,
+    7.14
+   ],
+   [
+    "and",
+    7.14,
+    7.34
+   ],
+   [
+    "a",
+    7.34,
+    7.6
+   ],
+   [
+    "bear,",
+    7.6,
+    7.6
+   ],
+   [
+    "four",
+    8.18,
+    8.38
+   ],
+   [
+    "strategy",
+    8.38,
+    8.82
+   ],
+   [
+    "desks,",
+    8.82,
+    9.18
+   ],
+   [
+    "a",
+    9.54,
+    9.72
+   ],
+   [
+    "risk",
+    9.72,
+    9.86
+   ],
+   [
+    "committee,",
+    9.86,
+    10.12
+   ],
+   [
+    "and",
+    10.52,
+    10.8
+   ],
+   [
+    "an",
+    10.8,
+    11.04
+   ],
+   [
+    "execution",
+    11.04,
+    11.42
+   ],
+   [
+    "router.",
+    11.42,
+    11.74
+   ],
+   [
+    "Everything",
+    12.3,
+    12.68
+   ],
+   [
+    "you",
+    12.68,
+    12.82
+   ],
+   [
+    "are",
+    12.82,
+    13.02
+   ],
+   [
+    "about",
+    13.02,
+    13.24
+   ],
+   [
+    "to",
+    13.24,
+    13.5
+   ],
+   [
+    "see",
+    13.5,
+    13.58
+   ],
+   [
+    "is",
+    13.58,
+    13.76
+   ],
+   [
+    "a",
+    13.76,
+    13.9
+   ],
+   [
+    "real",
+    13.9,
+    14.2
+   ],
+   [
+    "run,",
+    14.2,
+    14.56
+   ],
+   [
+    "recorded",
+    14.94,
+    15.24
+   ],
+   [
+    "against",
+    15.24,
+    15.62
+   ],
+   [
+    "the",
+    15.62,
+    15.78
+   ],
+   [
+    "live",
+    15.78,
+    16.06
+   ],
+   [
+    "graph",
+    16.06,
+    16.34
+   ],
+   [
+    "with",
+    16.34,
+    16.72
+   ],
+   [
+    "real",
+    16.72,
+    17.08
+   ],
+   [
+    "models.",
+    17.08,
+    17.4
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 1.92,
+    "text": "This is a hedge fund trading desk,"
+   },
+   {
+    "start": 1.94,
+    "end": 4.24,
+    "text": "built as a single LangGraph:"
+   },
+   {
+    "start": 4.26,
+    "end": 6.52,
+    "text": "nineteen nodes, with six analysts,"
+   },
+   {
+    "start": 6.9,
+    "end": 7.8,
+    "text": "a bull and a bear,"
+   },
+   {
+    "start": 8.18,
+    "end": 9.3,
+    "text": "four strategy desks,"
+   },
+   {
+    "start": 9.54,
+    "end": 11.86,
+    "text": "a risk committee, and an execution router."
+   },
+   {
+    "start": 12.3,
+    "end": 14.18,
+    "text": "Everything you are about to see is a real"
+   },
+   {
+    "start": 14.2,
+    "end": 16.32,
+    "text": "run, recorded against the live graph"
+   },
+   {
+    "start": 16.34,
+    "end": 17.52,
+    "text": "with real models."
+   }
+  ]
+ },
+ "B": {
+  "duration": 20.6,
+  "match": 0.9821,
+  "heard": "Nodes never call each other. They share one typed state, 13 channels. Each node reads what it needs and returns only the keys it changed. When parallel branches write to the same channel, a reducer decides how to combine them. Five channels here merge dictionaries, so six analysts can write at once, without overwriting each other.",
+  "problems": [
+   {
+    "said": "13",
+    "expected": "thirteen"
+   }
+  ],
+  "tokens": [
+   [
+    "Nodes",
+    0.0,
+    0.4
+   ],
+   [
+    "never",
+    0.4,
+    0.74
+   ],
+   [
+    "call",
+    0.74,
+    1.08
+   ],
+   [
+    "each",
+    1.08,
+    1.38
+   ],
+   [
+    "other.",
+    1.38,
+    1.5
+   ],
+   [
+    "They",
+    2.06,
+    2.24
+   ],
+   [
+    "share",
+    2.24,
+    2.44
+   ],
+   [
+    "one",
+    2.44,
+    2.82
+   ],
+   [
+    "typed",
+    2.82,
+    3.14
+   ],
+   [
+    "state,",
+    3.14,
+    3.48
+   ],
+   [
+    "thirteen",
+    3.84,
+    4.3
+   ],
+   [
+    "channels.",
+    4.3,
+    4.66
+   ],
+   [
+    "Each",
+    5.28,
+    5.54
+   ],
+   [
+    "node",
+    5.54,
+    5.74
+   ],
+   [
+    "reads",
+    5.74,
+    6.04
+   ],
+   [
+    "what",
+    6.04,
+    6.22
+   ],
+   [
+    "it",
+    6.22,
+    6.36
+   ],
+   [
+    "needs",
+    6.36,
+    6.64
+   ],
+   [
+    "and",
+    6.64,
+    7.14
+   ],
+   [
+    "returns",
+    7.14,
+    7.44
+   ],
+   [
+    "only",
+    7.44,
+    7.84
+   ],
+   [
+    "the",
+    7.84,
+    8.22
+   ],
+   [
+    "keys",
+    8.22,
+    8.22
+   ],
+   [
+    "it",
+    8.22,
+    8.48
+   ],
+   [
+    "changed.",
+    8.48,
+    8.8
+   ],
+   [
+    "When",
+    9.38,
+    9.56
+   ],
+   [
+    "parallel",
+    9.56,
+    9.96
+   ],
+   [
+    "branches",
+    9.96,
+    10.28
+   ],
+   [
+    "write",
+    10.28,
+    10.6
+   ],
+   [
+    "to",
+    10.6,
+    10.72
+   ],
+   [
+    "the",
+    10.72,
+    10.88
+   ],
+   [
+    "same",
+    10.88,
+    11.2
+   ],
+   [
+    "channel,",
+    11.2,
+    11.38
+   ],
+   [
+    "a",
+    11.76,
+    12.0
+   ],
+   [
+    "reducer",
+    12.0,
+    12.3
+   ],
+   [
+    "decides",
+    12.3,
+    12.72
+   ],
+   [
+    "how",
+    12.72,
+    12.92
+   ],
+   [
+    "to",
+    12.92,
+    13.18
+   ],
+   [
+    "combine",
+    13.18,
+    13.36
+   ],
+   [
+    "them:",
+    13.36,
+    13.58
+   ],
+   [
+    "five",
+    14.5,
+    14.76
+   ],
+   [
+    "channels",
+    14.76,
+    15.04
+   ],
+   [
+    "here",
+    15.04,
+    15.58
+   ],
+   [
+    "merge",
+    15.58,
+    15.84
+   ],
+   [
+    "dictionaries,",
+    15.84,
+    16.4
+   ],
+   [
+    "so",
+    16.9,
+    17.24
+   ],
+   [
+    "six",
+    17.24,
+    17.54
+   ],
+   [
+    "analysts",
+    17.54,
+    17.92
+   ],
+   [
+    "can",
+    17.92,
+    18.24
+   ],
+   [
+    "write",
+    18.24,
+    18.4
+   ],
+   [
+    "at",
+    18.4,
+    18.72
+   ],
+   [
+    "once",
+    18.72,
+    18.82
+   ],
+   [
+    "without",
+    19.48,
+    19.48
+   ],
+   [
+    "overwriting",
+    19.48,
+    19.98
+   ],
+   [
+    "each",
+    19.98,
+    20.28
+   ],
+   [
+    "other.",
+    20.28,
+    20.46
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 1.62,
+    "text": "Nodes never call each other."
+   },
+   {
+    "start": 2.06,
+    "end": 3.6,
+    "text": "They share one typed state,"
+   },
+   {
+    "start": 3.84,
+    "end": 4.78,
+    "text": "thirteen channels."
+   },
+   {
+    "start": 5.28,
+    "end": 6.62,
+    "text": "Each node reads what it needs"
+   },
+   {
+    "start": 6.64,
+    "end": 8.92,
+    "text": "and returns only the keys it changed."
+   },
+   {
+    "start": 9.38,
+    "end": 11.18,
+    "text": "When parallel branches write to the same"
+   },
+   {
+    "start": 11.2,
+    "end": 13.34,
+    "text": "channel, a reducer decides how to combine"
+   },
+   {
+    "start": 13.36,
+    "end": 16.52,
+    "text": "them: five channels here merge dictionaries,"
+   },
+   {
+    "start": 16.9,
+    "end": 19.46,
+    "text": "so six analysts can write at once without"
+   },
+   {
+    "start": 19.48,
+    "end": 20.58,
+    "text": "overwriting each other."
+   }
+  ]
+ },
+ "C": {
+  "duration": 23.606,
+  "match": 0.9538,
+  "heard": "The run starts at the CIO router, which fans out in two ways. Six analysts start at once. And a send call spawns one deep research worker per ticker. The same function, mapped over six inputs. They all run in one super-step, so the aggregator fires only when the slowest branch lands. And the reducers have merged 12 parallel writes into the state.",
+  "problems": [
+   {
+    "said": "cio",
+    "expected": "c i o"
+   },
+   {
+    "said": "12",
+    "expected": "twelve"
+   }
+  ],
+  "tokens": [
+   [
+    "The",
+    0.0,
+    0.44
+   ],
+   [
+    "run",
+    0.44,
+    0.52
+   ],
+   [
+    "starts",
+    0.52,
+    0.94
+   ],
+   [
+    "at",
+    0.94,
+    1.16
+   ],
+   [
+    "the",
+    1.16,
+    1.5
+   ],
+   [
+    "CIO",
+    1.5,
+    2.3
+   ],
+   [
+    "router,",
+    2.3,
+    2.62
+   ],
+   [
+    "which",
+    2.88,
+    3.14
+   ],
+   [
+    "fans",
+    3.14,
+    3.4
+   ],
+   [
+    "out",
+    3.4,
+    3.66
+   ],
+   [
+    "in",
+    3.66,
+    3.9
+   ],
+   [
+    "two",
+    3.9,
+    4.12
+   ],
+   [
+    "ways.",
+    4.12,
+    4.44
+   ],
+   [
+    "Six",
+    5.18,
+    5.28
+   ],
+   [
+    "analysts",
+    5.28,
+    5.66
+   ],
+   [
+    "start",
+    5.66,
+    5.98
+   ],
+   [
+    "at",
+    5.98,
+    6.24
+   ],
+   [
+    "once.",
+    6.24,
+    6.5
+   ],
+   [
+    "And",
+    7.08,
+    7.22
+   ],
+   [
+    "a",
+    7.22,
+    7.44
+   ],
+   [
+    "Send",
+    7.44,
+    7.7
+   ],
+   [
+    "call",
+    7.7,
+    8.02
+   ],
+   [
+    "spawns",
+    8.02,
+    8.52
+   ],
+   [
+    "one",
+    8.52,
+    8.84
+   ],
+   [
+    "deep",
+    8.84,
+    9.16
+   ],
+   [
+    "research",
+    9.16,
+    9.5
+   ],
+   [
+    "worker",
+    9.5,
+    9.76
+   ],
+   [
+    "per",
+    9.76,
+    10.14
+   ],
+   [
+    "ticker:",
+    10.14,
+    10.42
+   ],
+   [
+    "the",
+    10.94,
+    11.14
+   ],
+   [
+    "same",
+    11.14,
+    11.42
+   ],
+   [
+    "function,",
+    11.42,
+    11.8
+   ],
+   [
+    "mapped",
+    12.44,
+    12.44
+   ],
+   [
+    "over",
+    12.44,
+    12.86
+   ],
+   [
+    "six",
+    12.86,
+    13.18
+   ],
+   [
+    "inputs.",
+    13.18,
+    13.52
+   ],
+   [
+    "They",
+    14.16,
+    14.28
+   ],
+   [
+    "all",
+    14.28,
+    14.6
+   ],
+   [
+    "run",
+    14.6,
+    14.8
+   ],
+   [
+    "in",
+    14.8,
+    15.02
+   ],
+   [
+    "one",
+    15.02,
+    15.32
+   ],
+   [
+    "super-step,",
+    15.32,
+    15.88
+   ],
+   [
+    "so",
+    16.22,
+    16.48
+   ],
+   [
+    "the",
+    16.48,
+    16.68
+   ],
+   [
+    "aggregator",
+    16.68,
+    17.16
+   ],
+   [
+    "fires",
+    17.16,
+    17.52
+   ],
+   [
+    "only",
+    17.52,
+    18.04
+   ],
+   [
+    "when",
+    18.04,
+    18.24
+   ],
+   [
+    "the",
+    18.24,
+    18.46
+   ],
+   [
+    "slowest",
+    18.46,
+    18.86
+   ],
+   [
+    "branch",
+    18.86,
+    19.12
+   ],
+   [
+    "lands,",
+    19.12,
+    19.5
+   ],
+   [
+    "and",
+    20.02,
+    20.28
+   ],
+   [
+    "the",
+    20.28,
+    20.42
+   ],
+   [
+    "reducers",
+    20.42,
+    20.78
+   ],
+   [
+    "have",
+    20.78,
+    21.12
+   ],
+   [
+    "merged",
+    21.12,
+    21.34
+   ],
+   [
+    "twelve",
+    21.34,
+    21.86
+   ],
+   [
+    "parallel",
+    21.86,
+    22.28
+   ],
+   [
+    "writes",
+    22.28,
+    22.6
+   ],
+   [
+    "into",
+    22.6,
+    22.88
+   ],
+   [
+    "the",
+    22.88,
+    23.06
+   ],
+   [
+    "state.",
+    23.06,
+    23.34
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 2.74,
+    "text": "The run starts at the CIO router,"
+   },
+   {
+    "start": 2.88,
+    "end": 4.56,
+    "text": "which fans out in two ways."
+   },
+   {
+    "start": 5.18,
+    "end": 6.62,
+    "text": "Six analysts start at once."
+   },
+   {
+    "start": 7.08,
+    "end": 9.48,
+    "text": "And a Send call spawns one deep research"
+   },
+   {
+    "start": 9.5,
+    "end": 10.54,
+    "text": "worker per ticker:"
+   },
+   {
+    "start": 10.94,
+    "end": 11.92,
+    "text": "the same function,"
+   },
+   {
+    "start": 12.44,
+    "end": 13.64,
+    "text": "mapped over six inputs."
+   },
+   {
+    "start": 14.16,
+    "end": 16.0,
+    "text": "They all run in one super-step,"
+   },
+   {
+    "start": 16.22,
+    "end": 18.02,
+    "text": "so the aggregator fires only"
+   },
+   {
+    "start": 18.04,
+    "end": 19.62,
+    "text": "when the slowest branch lands,"
+   },
+   {
+    "start": 20.02,
+    "end": 22.26,
+    "text": "and the reducers have merged twelve parallel"
+   },
+   {
+    "start": 22.28,
+    "end": 23.46,
+    "text": "writes into the state."
+   }
+  ]
+ },
+ "D": {
+  "duration": 23.05,
+  "match": 0.9286,
+  "heard": "The aggregator feeds two nodes that run in parallel, a bull advocate and a bear critic, reading the same state and arguing opposing cases. Then the arbiter rules. In this run, it settled on market-neutral dispersion and split the capital. 15% momentum, 35% stat arb, 30% macro vol, 20% event arb.",
+  "problems": [
+   {
+    "said": "",
+    "expected": "percent"
+   },
+   {
+    "said": "",
+    "expected": "percent"
+   },
+   {
+    "said": "",
+    "expected": "percent"
+   },
+   {
+    "said": "",
+    "expected": "percent"
+   }
+  ],
+  "tokens": [
+   [
+    "The",
+    0.0,
+    0.52
+   ],
+   [
+    "aggregator",
+    0.52,
+    0.84
+   ],
+   [
+    "feeds",
+    0.84,
+    1.46
+   ],
+   [
+    "two",
+    1.46,
+    1.86
+   ],
+   [
+    "nodes",
+    1.86,
+    2.12
+   ],
+   [
+    "that",
+    2.12,
+    2.48
+   ],
+   [
+    "run",
+    2.48,
+    2.58
+   ],
+   [
+    "in",
+    2.58,
+    3.12
+   ],
+   [
+    "parallel:",
+    3.12,
+    3.12
+   ],
+   [
+    "a",
+    3.66,
+    3.92
+   ],
+   [
+    "bull",
+    3.92,
+    4.08
+   ],
+   [
+    "advocate",
+    4.08,
+    4.44
+   ],
+   [
+    "and",
+    4.44,
+    4.82
+   ],
+   [
+    "a",
+    4.82,
+    5.12
+   ],
+   [
+    "bear",
+    5.12,
+    5.18
+   ],
+   [
+    "critic,",
+    5.18,
+    5.52
+   ],
+   [
+    "reading",
+    5.88,
+    6.14
+   ],
+   [
+    "the",
+    6.14,
+    6.36
+   ],
+   [
+    "same",
+    6.36,
+    6.54
+   ],
+   [
+    "state",
+    6.54,
+    6.9
+   ],
+   [
+    "and",
+    6.9,
+    7.3
+   ],
+   [
+    "arguing",
+    7.3,
+    7.66
+   ],
+   [
+    "opposing",
+    7.66,
+    8.16
+   ],
+   [
+    "cases.",
+    8.16,
+    8.62
+   ],
+   [
+    "Then",
+    9.18,
+    9.9
+   ],
+   [
+    "the",
+    9.9,
+    10.28
+   ],
+   [
+    "arbiter",
+    10.28,
+    10.5
+   ],
+   [
+    "rules.",
+    10.5,
+    10.94
+   ],
+   [
+    "In",
+    11.62,
+    11.74
+   ],
+   [
+    "this",
+    11.74,
+    11.98
+   ],
+   [
+    "run",
+    11.98,
+    12.22
+   ],
+   [
+    "it",
+    12.56,
+    12.82
+   ],
+   [
+    "settled",
+    12.82,
+    12.96
+   ],
+   [
+    "on",
+    12.96,
+    13.34
+   ],
+   [
+    "market",
+    13.34,
+    13.56
+   ],
+   [
+    "neutral",
+    13.56,
+    13.86
+   ],
+   [
+    "dispersion,",
+    13.86,
+    14.44
+   ],
+   [
+    "and",
+    14.44,
+    14.94
+   ],
+   [
+    "split",
+    14.94,
+    15.16
+   ],
+   [
+    "the",
+    15.16,
+    15.5
+   ],
+   [
+    "capital:",
+    15.5,
+    15.68
+   ],
+   [
+    "15%",
+    16.36,
+    17.06
+   ],
+   [
+    "momentum,",
+    17.06,
+    17.46
+   ],
+   [
+    "35%",
+    18.0,
+    18.82
+   ],
+   [
+    "stat",
+    18.82,
+    19.2
+   ],
+   [
+    "arb,",
+    19.2,
+    19.26
+   ],
+   [
+    "30%",
+    19.78,
+    20.46
+   ],
+   [
+    "macro",
+    20.46,
+    20.82
+   ],
+   [
+    "vol,",
+    20.82,
+    21.06
+   ],
+   [
+    "20%",
+    21.58,
+    22.34
+   ],
+   [
+    "event",
+    22.34,
+    22.62
+   ],
+   [
+    "arb.",
+    22.62,
+    22.88
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 2.1,
+    "text": "The aggregator feeds two nodes"
+   },
+   {
+    "start": 2.12,
+    "end": 3.24,
+    "text": "that run in parallel:"
+   },
+   {
+    "start": 3.66,
+    "end": 5.64,
+    "text": "a bull advocate and a bear critic,"
+   },
+   {
+    "start": 5.88,
+    "end": 6.88,
+    "text": "reading the same state"
+   },
+   {
+    "start": 6.9,
+    "end": 8.74,
+    "text": "and arguing opposing cases."
+   },
+   {
+    "start": 9.18,
+    "end": 11.06,
+    "text": "Then the arbiter rules."
+   },
+   {
+    "start": 11.62,
+    "end": 13.84,
+    "text": "In this run it settled on market neutral"
+   },
+   {
+    "start": 13.86,
+    "end": 15.8,
+    "text": "dispersion, and split the capital:"
+   },
+   {
+    "start": 16.36,
+    "end": 19.38,
+    "text": "15% momentum, 35% stat arb,"
+   },
+   {
+    "start": 19.78,
+    "end": 23.0,
+    "text": "30% macro vol, 20% event arb."
+   }
+  ]
+ },
+ "E": {
+  "duration": 22.25,
+  "match": 1.0,
+  "heard": "Next, the desks. The arbiter returns one send per desk, but there is only one desk subgraph, compiled once with its own input and output schemas, and run four times in parallel. A quant models the legs, a desk head signs off, and the quant's draft stays in a private channel. Only the final proposal flows back to shared state.",
+  "problems": [],
+  "tokens": [
+   [
+    "Next,",
+    0.0,
+    0.48
+   ],
+   [
+    "the",
+    0.8,
+    1.4
+   ],
+   [
+    "desks.",
+    1.4,
+    1.52
+   ],
+   [
+    "The",
+    2.22,
+    2.48
+   ],
+   [
+    "arbiter",
+    2.48,
+    2.66
+   ],
+   [
+    "returns",
+    2.66,
+    3.1
+   ],
+   [
+    "one",
+    3.1,
+    3.6
+   ],
+   [
+    "Send",
+    3.6,
+    3.86
+   ],
+   [
+    "per",
+    3.86,
+    4.44
+   ],
+   [
+    "desk,",
+    4.44,
+    4.72
+   ],
+   [
+    "but",
+    5.26,
+    5.36
+   ],
+   [
+    "there",
+    5.36,
+    5.48
+   ],
+   [
+    "is",
+    5.48,
+    5.66
+   ],
+   [
+    "only",
+    5.66,
+    5.84
+   ],
+   [
+    "one",
+    5.84,
+    6.28
+   ],
+   [
+    "desk",
+    6.28,
+    6.48
+   ],
+   [
+    "subgraph,",
+    6.48,
+    7.02
+   ],
+   [
+    "compiled",
+    7.84,
+    7.84
+   ],
+   [
+    "once",
+    7.84,
+    8.26
+   ],
+   [
+    "with",
+    8.26,
+    8.5
+   ],
+   [
+    "its",
+    8.5,
+    8.66
+   ],
+   [
+    "own",
+    8.66,
+    9.04
+   ],
+   [
+    "input",
+    9.04,
+    9.22
+   ],
+   [
+    "and",
+    9.22,
+    9.56
+   ],
+   [
+    "output",
+    9.56,
+    9.78
+   ],
+   [
+    "schemas,",
+    9.78,
+    10.24
+   ],
+   [
+    "and",
+    10.56,
+    11.0
+   ],
+   [
+    "run",
+    11.0,
+    11.18
+   ],
+   [
+    "four",
+    11.18,
+    11.54
+   ],
+   [
+    "times",
+    11.54,
+    11.88
+   ],
+   [
+    "in",
+    11.88,
+    12.44
+   ],
+   [
+    "parallel.",
+    12.44,
+    12.44
+   ],
+   [
+    "A",
+    13.04,
+    13.52
+   ],
+   [
+    "quant",
+    13.52,
+    13.52
+   ],
+   [
+    "models",
+    13.52,
+    13.9
+   ],
+   [
+    "the",
+    13.9,
+    14.4
+   ],
+   [
+    "legs,",
+    14.4,
+    14.4
+   ],
+   [
+    "a",
+    14.88,
+    15.14
+   ],
+   [
+    "desk",
+    15.14,
+    15.32
+   ],
+   [
+    "head",
+    15.32,
+    15.56
+   ],
+   [
+    "signs",
+    15.56,
+    15.86
+   ],
+   [
+    "off,",
+    15.86,
+    16.22
+   ],
+   [
+    "and",
+    16.4,
+    16.74
+   ],
+   [
+    "the",
+    16.74,
+    16.9
+   ],
+   [
+    "quant's",
+    16.9,
+    17.5
+   ],
+   [
+    "draft",
+    17.5,
+    17.5
+   ],
+   [
+    "stays",
+    17.5,
+    17.78
+   ],
+   [
+    "in",
+    17.78,
+    17.92
+   ],
+   [
+    "a",
+    17.92,
+    18.28
+   ],
+   [
+    "private",
+    18.28,
+    18.28
+   ],
+   [
+    "channel.",
+    18.28,
+    18.64
+   ],
+   [
+    "Only",
+    19.32,
+    19.56
+   ],
+   [
+    "the",
+    19.56,
+    19.76
+   ],
+   [
+    "final",
+    19.76,
+    20.08
+   ],
+   [
+    "proposal",
+    20.08,
+    20.48
+   ],
+   [
+    "flows",
+    20.48,
+    21.08
+   ],
+   [
+    "back",
+    21.08,
+    21.38
+   ],
+   [
+    "to",
+    21.38,
+    21.62
+   ],
+   [
+    "shared",
+    21.62,
+    21.76
+   ],
+   [
+    "state.",
+    21.76,
+    22.12
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 1.64,
+    "text": "Next, the desks."
+   },
+   {
+    "start": 2.22,
+    "end": 4.84,
+    "text": "The arbiter returns one Send per desk,"
+   },
+   {
+    "start": 5.26,
+    "end": 7.14,
+    "text": "but there is only one desk subgraph,"
+   },
+   {
+    "start": 7.84,
+    "end": 9.2,
+    "text": "compiled once with its own input"
+   },
+   {
+    "start": 9.22,
+    "end": 10.36,
+    "text": "and output schemas,"
+   },
+   {
+    "start": 10.56,
+    "end": 12.56,
+    "text": "and run four times in parallel."
+   },
+   {
+    "start": 13.04,
+    "end": 14.52,
+    "text": "A quant models the legs,"
+   },
+   {
+    "start": 14.88,
+    "end": 16.34,
+    "text": "a desk head signs off,"
+   },
+   {
+    "start": 16.4,
+    "end": 18.76,
+    "text": "and the quant's draft stays in a private channel."
+   },
+   {
+    "start": 19.32,
+    "end": 22.24,
+    "text": "Only the final proposal flows back to shared state."
+   }
+  ]
+ },
+ "F": {
+  "duration": 20.396,
+  "match": 0.9492,
+  "heard": "Now, the gate. Two auditors run in parallel, and the chief risk officer reads them, but the language model does not get the final say. A deterministic risk engine computes exposure and value at risk, and its verdict is authoritative. Here it flags the momentum desk, a TLT position of $14 million against a $12 million cap.",
+  "problems": [
+   {
+    "said": "tlt",
+    "expected": "t l t"
+   },
+   {
+    "said": "",
+    "expected": "dollars"
+   },
+   {
+    "said": "",
+    "expected": "dollars"
+   }
+  ],
+  "tokens": [
+   [
+    "Now",
+    0.0,
+    0.38
+   ],
+   [
+    "the",
+    0.54,
+    0.74
+   ],
+   [
+    "gate.",
+    0.74,
+    0.96
+   ],
+   [
+    "Two",
+    1.74,
+    1.76
+   ],
+   [
+    "auditors",
+    1.76,
+    2.04
+   ],
+   [
+    "run",
+    2.04,
+    2.4
+   ],
+   [
+    "in",
+    2.4,
+    2.76
+   ],
+   [
+    "parallel,",
+    2.76,
+    2.92
+   ],
+   [
+    "and",
+    3.34,
+    3.52
+   ],
+   [
+    "the",
+    3.52,
+    3.76
+   ],
+   [
+    "chief",
+    3.76,
+    3.9
+   ],
+   [
+    "risk",
+    3.9,
+    4.16
+   ],
+   [
+    "officer",
+    4.16,
+    4.52
+   ],
+   [
+    "reads",
+    4.52,
+    4.78
+   ],
+   [
+    "them.",
+    4.78,
+    5.08
+   ],
+   [
+    "But",
+    5.52,
+    5.6
+   ],
+   [
+    "the",
+    5.6,
+    5.86
+   ],
+   [
+    "language",
+    5.86,
+    6.04
+   ],
+   [
+    "model",
+    6.04,
+    6.34
+   ],
+   [
+    "does",
+    6.34,
+    6.64
+   ],
+   [
+    "not",
+    6.64,
+    6.9
+   ],
+   [
+    "get",
+    6.9,
+    7.08
+   ],
+   [
+    "the",
+    7.08,
+    7.24
+   ],
+   [
+    "final",
+    7.24,
+    7.44
+   ],
+   [
+    "say:",
+    7.44,
+    7.76
+   ],
+   [
+    "a",
+    8.24,
+    8.34
+   ],
+   [
+    "deterministic",
+    8.34,
+    8.92
+   ],
+   [
+    "risk",
+    8.92,
+    9.22
+   ],
+   [
+    "engine",
+    9.22,
+    9.54
+   ],
+   [
+    "computes",
+    9.54,
+    9.94
+   ],
+   [
+    "exposure",
+    9.94,
+    10.42
+   ],
+   [
+    "and",
+    10.42,
+    10.8
+   ],
+   [
+    "value",
+    10.8,
+    11.04
+   ],
+   [
+    "at",
+    11.04,
+    11.38
+   ],
+   [
+    "risk,",
+    11.38,
+    11.52
+   ],
+   [
+    "and",
+    11.66,
+    12.02
+   ],
+   [
+    "its",
+    12.02,
+    12.22
+   ],
+   [
+    "verdict",
+    12.22,
+    12.46
+   ],
+   [
+    "is",
+    12.46,
+    12.8
+   ],
+   [
+    "authoritative.",
+    12.8,
+    13.28
+   ],
+   [
+    "Here",
+    13.9,
+    14.08
+   ],
+   [
+    "it",
+    14.08,
+    14.3
+   ],
+   [
+    "flags",
+    14.3,
+    14.5
+   ],
+   [
+    "the",
+    14.5,
+    14.74
+   ],
+   [
+    "momentum",
+    14.74,
+    14.98
+   ],
+   [
+    "desk:",
+    14.98,
+    15.42
+   ],
+   [
+    "a",
+    15.8,
+    16.04
+   ],
+   [
+    "TLT",
+    16.04,
+    16.46
+   ],
+   [
+    "position",
+    16.46,
+    16.84
+   ],
+   [
+    "of",
+    16.84,
+    17.18
+   ],
+   [
+    "$14M,",
+    17.18,
+    17.91
+   ],
+   [
+    "against",
+    17.86,
+    18.8
+   ],
+   [
+    "a",
+    18.8,
+    19.0
+   ],
+   [
+    "$12M",
+    19.0,
+    19.69
+   ],
+   [
+    "cap.",
+    19.64,
+    20.14
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 1.08,
+    "text": "Now the gate."
+   },
+   {
+    "start": 1.74,
+    "end": 3.04,
+    "text": "Two auditors run in parallel,"
+   },
+   {
+    "start": 3.34,
+    "end": 5.2,
+    "text": "and the chief risk officer reads them."
+   },
+   {
+    "start": 5.52,
+    "end": 7.22,
+    "text": "But the language model does not get the"
+   },
+   {
+    "start": 7.24,
+    "end": 9.52,
+    "text": "final say: a deterministic risk engine"
+   },
+   {
+    "start": 9.54,
+    "end": 11.64,
+    "text": "computes exposure and value at risk,"
+   },
+   {
+    "start": 11.66,
+    "end": 13.4,
+    "text": "and its verdict is authoritative."
+   },
+   {
+    "start": 13.9,
+    "end": 15.54,
+    "text": "Here it flags the momentum desk:"
+   },
+   {
+    "start": 15.8,
+    "end": 17.84,
+    "text": "a TLT position of $14M,"
+   },
+   {
+    "start": 17.86,
+    "end": 20.26,
+    "text": "against a $12M cap."
+   }
+  ]
+ },
+ "G": {
+  "duration": 25.25,
+  "match": 0.9375,
+  "heard": "The conditional edge returns the verdict revise, and the router sends only the offending desk around again with a fresh send. The revision counter moves from zero to one. Momentum comes back with a book of $11.5 million gross. The engine rechecks, and this time it approves. About 98.5% gross, 9.5% net. Value at risk under the limit.",
+  "problems": [
+   {
+    "said": "",
+    "expected": "dollars"
+   },
+   {
+    "said": "rechecks",
+    "expected": "re checks"
+   },
+   {
+    "said": "",
+    "expected": "percent"
+   },
+   {
+    "said": "",
+    "expected": "percent"
+   }
+  ],
+  "tokens": [
+   [
+    "The",
+    0.0,
+    0.28
+   ],
+   [
+    "conditional",
+    0.28,
+    0.84
+   ],
+   [
+    "edge",
+    0.84,
+    1.36
+   ],
+   [
+    "returns",
+    1.36,
+    1.94
+   ],
+   [
+    "the",
+    1.94,
+    2.58
+   ],
+   [
+    "verdict",
+    2.58,
+    2.58
+   ],
+   [
+    "revise,",
+    2.58,
+    3.1
+   ],
+   [
+    "and",
+    3.68,
+    3.76
+   ],
+   [
+    "the",
+    3.76,
+    4.1
+   ],
+   [
+    "router",
+    4.1,
+    4.12
+   ],
+   [
+    "sends",
+    4.12,
+    4.44
+   ],
+   [
+    "only",
+    4.44,
+    4.76
+   ],
+   [
+    "the",
+    4.76,
+    5.04
+   ],
+   [
+    "offending",
+    5.04,
+    5.36
+   ],
+   [
+    "desk",
+    5.36,
+    5.74
+   ],
+   [
+    "around",
+    5.74,
+    6.18
+   ],
+   [
+    "again,",
+    6.18,
+    6.5
+   ],
+   [
+    "with",
+    6.5,
+    6.94
+   ],
+   [
+    "a",
+    6.94,
+    7.12
+   ],
+   [
+    "fresh",
+    7.12,
+    7.32
+   ],
+   [
+    "Send.",
+    7.32,
+    7.66
+   ],
+   [
+    "The",
+    8.32,
+    8.48
+   ],
+   [
+    "revision",
+    8.48,
+    8.8
+   ],
+   [
+    "counter",
+    8.8,
+    9.24
+   ],
+   [
+    "moves",
+    9.24,
+    9.64
+   ],
+   [
+    "from",
+    9.64,
+    9.96
+   ],
+   [
+    "zero",
+    9.96,
+    10.24
+   ],
+   [
+    "to",
+    10.24,
+    10.58
+   ],
+   [
+    "one.",
+    10.58,
+    11.08
+   ],
+   [
+    "Momentum",
+    11.88,
+    12.0
+   ],
+   [
+    "comes",
+    12.0,
+    12.24
+   ],
+   [
+    "back",
+    12.24,
+    12.54
+   ],
+   [
+    "with",
+    12.54,
+    12.7
+   ],
+   [
+    "a",
+    12.7,
+    12.96
+   ],
+   [
+    "book",
+    12.96,
+    13.02
+   ],
+   [
+    "of",
+    13.02,
+    13.26
+   ],
+   [
+    "$11.5M",
+    13.26,
+    14.55
+   ],
+   [
+    "gross,",
+    14.5,
+    15.14
+   ],
+   [
+    "the",
+    15.7,
+    15.88
+   ],
+   [
+    "engine",
+    15.88,
+    16.14
+   ],
+   [
+    "re-checks,",
+    16.14,
+    16.64
+   ],
+   [
+    "and",
+    17.02,
+    17.3
+   ],
+   [
+    "this",
+    17.3,
+    17.52
+   ],
+   [
+    "time",
+    17.52,
+    17.8
+   ],
+   [
+    "it",
+    17.8,
+    18.02
+   ],
+   [
+    "approves:",
+    18.02,
+    18.38
+   ],
+   [
+    "about",
+    18.96,
+    19.18
+   ],
+   [
+    "98.5%",
+    19.18,
+    20.54
+   ],
+   [
+    "gross,",
+    20.54,
+    20.92
+   ],
+   [
+    "9.5%",
+    21.44,
+    22.5
+   ],
+   [
+    "net,",
+    22.5,
+    22.78
+   ],
+   [
+    "value",
+    23.56,
+    23.68
+   ],
+   [
+    "at",
+    23.68,
+    23.9
+   ],
+   [
+    "risk",
+    23.9,
+    24.16
+   ],
+   [
+    "under",
+    24.16,
+    24.58
+   ],
+   [
+    "the",
+    24.58,
+    24.82
+   ],
+   [
+    "limit.",
+    24.82,
+    25.04
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 2.56,
+    "text": "The conditional edge returns the verdict"
+   },
+   {
+    "start": 2.58,
+    "end": 5.02,
+    "text": "revise, and the router sends only the"
+   },
+   {
+    "start": 5.04,
+    "end": 6.48,
+    "text": "offending desk around again,"
+   },
+   {
+    "start": 6.5,
+    "end": 7.78,
+    "text": "with a fresh Send."
+   },
+   {
+    "start": 8.32,
+    "end": 9.62,
+    "text": "The revision counter moves"
+   },
+   {
+    "start": 9.64,
+    "end": 11.2,
+    "text": "from zero to one."
+   },
+   {
+    "start": 11.88,
+    "end": 14.48,
+    "text": "Momentum comes back with a book of $11.5M"
+   },
+   {
+    "start": 14.5,
+    "end": 16.76,
+    "text": "gross, the engine re-checks,"
+   },
+   {
+    "start": 17.02,
+    "end": 18.5,
+    "text": "and this time it approves:"
+   },
+   {
+    "start": 18.96,
+    "end": 21.04,
+    "text": "about 98.5% gross,"
+   },
+   {
+    "start": 21.44,
+    "end": 25.16,
+    "text": "9.5% net, value at risk under the limit."
+   }
+  ]
+ },
+ "H": {
+  "duration": 16.25,
+  "match": 1.0,
+  "heard": "The loop is bounded to two rounds. If breaches are still open after that, the graph does not approve by default. A rejected verdict routes to a halt node, and the run ends with no trade. That branch did not fire in this recording. The test suite covers it.",
+  "problems": [],
+  "tokens": [
+   [
+    "The",
+    0.0,
+    0.26
+   ],
+   [
+    "loop",
+    0.26,
+    0.48
+   ],
+   [
+    "is",
+    0.48,
+    0.96
+   ],
+   [
+    "bounded",
+    0.96,
+    1.14
+   ],
+   [
+    "to",
+    1.14,
+    1.48
+   ],
+   [
+    "two",
+    1.48,
+    1.74
+   ],
+   [
+    "rounds.",
+    1.74,
+    2.04
+   ],
+   [
+    "If",
+    2.76,
+    2.9
+   ],
+   [
+    "breaches",
+    2.9,
+    3.16
+   ],
+   [
+    "are",
+    3.16,
+    3.42
+   ],
+   [
+    "still",
+    3.42,
+    3.68
+   ],
+   [
+    "open",
+    3.68,
+    3.92
+   ],
+   [
+    "after",
+    3.92,
+    4.18
+   ],
+   [
+    "that,",
+    4.18,
+    4.44
+   ],
+   [
+    "the",
+    4.88,
+    5.12
+   ],
+   [
+    "graph",
+    5.12,
+    5.32
+   ],
+   [
+    "does",
+    5.32,
+    5.56
+   ],
+   [
+    "not",
+    5.56,
+    5.76
+   ],
+   [
+    "approve",
+    5.76,
+    6.06
+   ],
+   [
+    "by",
+    6.06,
+    6.3
+   ],
+   [
+    "default:",
+    6.3,
+    6.6
+   ],
+   [
+    "a",
+    7.3,
+    7.5
+   ],
+   [
+    "rejected",
+    7.5,
+    7.86
+   ],
+   [
+    "verdict",
+    7.86,
+    8.26
+   ],
+   [
+    "routes",
+    8.26,
+    8.66
+   ],
+   [
+    "to",
+    8.66,
+    8.88
+   ],
+   [
+    "a",
+    8.88,
+    9.16
+   ],
+   [
+    "halt",
+    9.16,
+    9.26
+   ],
+   [
+    "node,",
+    9.26,
+    9.54
+   ],
+   [
+    "and",
+    9.86,
+    10.24
+   ],
+   [
+    "the",
+    10.24,
+    10.5
+   ],
+   [
+    "run",
+    10.5,
+    10.6
+   ],
+   [
+    "ends",
+    10.6,
+    10.9
+   ],
+   [
+    "with",
+    10.9,
+    11.14
+   ],
+   [
+    "no",
+    11.14,
+    11.42
+   ],
+   [
+    "trade.",
+    11.42,
+    11.7
+   ],
+   [
+    "That",
+    12.58,
+    12.78
+   ],
+   [
+    "branch",
+    12.78,
+    13.04
+   ],
+   [
+    "did",
+    13.04,
+    13.28
+   ],
+   [
+    "not",
+    13.28,
+    13.54
+   ],
+   [
+    "fire",
+    13.54,
+    13.78
+   ],
+   [
+    "in",
+    13.78,
+    14.0
+   ],
+   [
+    "this",
+    14.0,
+    14.18
+   ],
+   [
+    "recording;",
+    14.18,
+    14.5
+   ],
+   [
+    "the",
+    15.04,
+    15.22
+   ],
+   [
+    "test",
+    15.22,
+    15.46
+   ],
+   [
+    "suite",
+    15.46,
+    15.66
+   ],
+   [
+    "covers",
+    15.66,
+    15.92
+   ],
+   [
+    "it.",
+    15.92,
+    16.2
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 2.16,
+    "text": "The loop is bounded to two rounds."
+   },
+   {
+    "start": 2.76,
+    "end": 4.16,
+    "text": "If breaches are still open after"
+   },
+   {
+    "start": 4.18,
+    "end": 6.72,
+    "text": "that, the graph does not approve by default:"
+   },
+   {
+    "start": 7.3,
+    "end": 9.66,
+    "text": "a rejected verdict routes to a halt node,"
+   },
+   {
+    "start": 9.86,
+    "end": 11.82,
+    "text": "and the run ends with no trade."
+   },
+   {
+    "start": 12.58,
+    "end": 14.62,
+    "text": "That branch did not fire in this recording;"
+   },
+   {
+    "start": 15.04,
+    "end": 16.32,
+    "text": "the test suite covers it."
+   }
+  ]
+ },
+ "I": {
+  "duration": 20.05,
+  "match": 0.9167,
+  "heard": "Approved. So the head of trading releases the blotter, $25.2 million gross, scaled and hedged. The execution router slices seven parent orders into child orders across dark pools, IEX, and lit venues, with about $43,000 of estimated cost. And the run reaches its end.",
+  "problems": [
+   {
+    "said": "",
+    "expected": "dollars"
+   },
+   {
+    "said": "iex",
+    "expected": "i e x"
+   },
+   {
+    "said": "000",
+    "expected": "thousand dollars"
+   }
+  ],
+  "tokens": [
+   [
+    "Approved,",
+    0.0,
+    0.8
+   ],
+   [
+    "so",
+    1.22,
+    1.44
+   ],
+   [
+    "the",
+    1.44,
+    1.68
+   ],
+   [
+    "head",
+    1.68,
+    1.76
+   ],
+   [
+    "of",
+    1.76,
+    1.98
+   ],
+   [
+    "trading",
+    1.98,
+    2.22
+   ],
+   [
+    "releases",
+    2.22,
+    2.7
+   ],
+   [
+    "the",
+    2.7,
+    3.0
+   ],
+   [
+    "blotter:",
+    3.0,
+    3.22
+   ],
+   [
+    "$25.2M",
+    4.02,
+    5.27
+   ],
+   [
+    "gross,",
+    5.22,
+    6.02
+   ],
+   [
+    "scaled",
+    6.72,
+    6.72
+   ],
+   [
+    "and",
+    6.72,
+    7.18
+   ],
+   [
+    "hedged.",
+    7.18,
+    7.48
+   ],
+   [
+    "The",
+    7.9,
+    8.14
+   ],
+   [
+    "execution",
+    8.14,
+    8.6
+   ],
+   [
+    "router",
+    8.6,
+    9.04
+   ],
+   [
+    "slices",
+    9.04,
+    9.4
+   ],
+   [
+    "seven",
+    9.4,
+    9.92
+   ],
+   [
+    "parent",
+    9.92,
+    10.2
+   ],
+   [
+    "orders",
+    10.2,
+    10.46
+   ],
+   [
+    "into",
+    10.46,
+    10.78
+   ],
+   [
+    "child",
+    10.78,
+    11.18
+   ],
+   [
+    "orders",
+    11.18,
+    11.44
+   ],
+   [
+    "across",
+    11.44,
+    11.88
+   ],
+   [
+    "dark",
+    11.88,
+    12.26
+   ],
+   [
+    "pools,",
+    12.26,
+    12.54
+   ],
+   [
+    "IEX",
+    13.24,
+    13.58
+   ],
+   [
+    "and",
+    13.98,
+    14.16
+   ],
+   [
+    "lit",
+    14.16,
+    14.28
+   ],
+   [
+    "venues,",
+    14.28,
+    14.66
+   ],
+   [
+    "with",
+    15.04,
+    15.48
+   ],
+   [
+    "about",
+    15.48,
+    15.74
+   ],
+   [
+    "$43k",
+    15.74,
+    16.64
+   ],
+   [
+    "of",
+    16.64,
+    17.18
+   ],
+   [
+    "estimated",
+    17.18,
+    17.56
+   ],
+   [
+    "cost,",
+    17.56,
+    18.06
+   ],
+   [
+    "and",
+    18.44,
+    18.66
+   ],
+   [
+    "the",
+    18.66,
+    18.88
+   ],
+   [
+    "run",
+    18.88,
+    19.02
+   ],
+   [
+    "reaches",
+    19.02,
+    19.32
+   ],
+   [
+    "its",
+    19.32,
+    19.58
+   ],
+   [
+    "end.",
+    19.58,
+    19.78
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 2.68,
+    "text": "Approved, so the head of trading releases"
+   },
+   {
+    "start": 2.7,
+    "end": 6.14,
+    "text": "the blotter: $25.2M gross,"
+   },
+   {
+    "start": 6.72,
+    "end": 7.62,
+    "text": "scaled and hedged."
+   },
+   {
+    "start": 7.9,
+    "end": 10.18,
+    "text": "The execution router slices seven parent"
+   },
+   {
+    "start": 10.2,
+    "end": 11.42,
+    "text": "orders into child orders"
+   },
+   {
+    "start": 11.44,
+    "end": 12.66,
+    "text": "across dark pools,"
+   },
+   {
+    "start": 13.24,
+    "end": 14.78,
+    "text": "IEX and lit venues,"
+   },
+   {
+    "start": 15.04,
+    "end": 18.18,
+    "text": "with about $43k of estimated cost,"
+   },
+   {
+    "start": 18.44,
+    "end": 19.9,
+    "text": "and the run reaches its end."
+   }
+  ]
+ },
+ "K": {
+  "duration": 15.8,
+  "match": 0.9231,
+  "heard": "One shared state, parallel fanouts, a subgraph reused four times, a deterministic gate with a bounded loop, and a fail-closed exit. Run it with LangGraphDev and watch it in Studio. It is a demo on paper data, and it is not trading advice.",
+  "problems": [
+   {
+    "said": "fanouts",
+    "expected": "fan outs"
+   },
+   {
+    "said": "langgraphdev",
+    "expected": "lang graph dev"
+   }
+  ],
+  "tokens": [
+   [
+    "One",
+    0.0,
+    0.34
+   ],
+   [
+    "shared",
+    0.34,
+    0.58
+   ],
+   [
+    "state,",
+    0.58,
+    0.96
+   ],
+   [
+    "parallel",
+    1.6,
+    1.82
+   ],
+   [
+    "fan-outs,",
+    1.82,
+    2.34
+   ],
+   [
+    "a",
+    2.9,
+    3.18
+   ],
+   [
+    "subgraph",
+    3.18,
+    3.46
+   ],
+   [
+    "reused",
+    3.46,
+    3.92
+   ],
+   [
+    "four",
+    3.92,
+    4.26
+   ],
+   [
+    "times,",
+    4.26,
+    4.64
+   ],
+   [
+    "a",
+    5.18,
+    5.36
+   ],
+   [
+    "deterministic",
+    5.36,
+    5.84
+   ],
+   [
+    "gate",
+    5.84,
+    6.1
+   ],
+   [
+    "with",
+    6.1,
+    6.28
+   ],
+   [
+    "a",
+    6.28,
+    6.74
+   ],
+   [
+    "bounded",
+    6.74,
+    6.74
+   ],
+   [
+    "loop,",
+    6.74,
+    7.02
+   ],
+   [
+    "and",
+    7.48,
+    7.54
+   ],
+   [
+    "a",
+    7.54,
+    7.8
+   ],
+   [
+    "fail-closed",
+    7.8,
+    8.24
+   ],
+   [
+    "exit.",
+    8.24,
+    8.62
+   ],
+   [
+    "Run",
+    9.46,
+    9.48
+   ],
+   [
+    "it",
+    9.48,
+    9.6
+   ],
+   [
+    "with",
+    9.6,
+    9.82
+   ],
+   [
+    "langgraph",
+    9.82,
+    10.273
+   ],
+   [
+    "dev",
+    10.273,
+    10.5
+   ],
+   [
+    "and",
+    10.5,
+    10.98
+   ],
+   [
+    "watch",
+    10.98,
+    11.18
+   ],
+   [
+    "it",
+    11.18,
+    11.34
+   ],
+   [
+    "in",
+    11.34,
+    11.6
+   ],
+   [
+    "Studio.",
+    11.6,
+    11.82
+   ],
+   [
+    "It",
+    12.48,
+    12.6
+   ],
+   [
+    "is",
+    12.6,
+    12.74
+   ],
+   [
+    "a",
+    12.74,
+    13.1
+   ],
+   [
+    "demo",
+    13.1,
+    13.1
+   ],
+   [
+    "on",
+    13.1,
+    13.4
+   ],
+   [
+    "paper",
+    13.4,
+    13.7
+   ],
+   [
+    "data,",
+    13.7,
+    13.96
+   ],
+   [
+    "and",
+    14.38,
+    14.5
+   ],
+   [
+    "it",
+    14.5,
+    14.6
+   ],
+   [
+    "is",
+    14.6,
+    14.76
+   ],
+   [
+    "not",
+    14.76,
+    15.02
+   ],
+   [
+    "trading",
+    15.02,
+    15.3
+   ],
+   [
+    "advice.",
+    15.3,
+    15.66
+   ]
+  ],
+  "cues": [
+   {
+    "start": 0.0,
+    "end": 2.46,
+    "text": "One shared state, parallel fan-outs,"
+   },
+   {
+    "start": 2.9,
+    "end": 4.76,
+    "text": "a subgraph reused four times,"
+   },
+   {
+    "start": 5.18,
+    "end": 7.14,
+    "text": "a deterministic gate with a bounded loop,"
+   },
+   {
+    "start": 7.48,
+    "end": 8.74,
+    "text": "and a fail-closed exit."
+   },
+   {
+    "start": 9.46,
+    "end": 10.48,
+    "text": "Run it with langgraph dev"
+   },
+   {
+    "start": 10.5,
+    "end": 11.94,
+    "text": "and watch it in Studio."
+   },
+   {
+    "start": 12.48,
+    "end": 14.08,
+    "text": "It is a demo on paper data,"
+   },
+   {
+    "start": 14.38,
+    "end": 15.78,
+    "text": "and it is not trading advice."
+   }
+  ]
+ }
+}

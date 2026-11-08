@@ -1,0 +1,42 @@
+{
+  "model": "gpt-4o-mini-tts",
+  "voice": "marin",
+  "instructions": "Voice: a calm, precise, friendly engineer walking a colleague through a system they built, with a slight dry smile. Pace: measured and clear, never rushed, a short breath at each comma and a slightly longer one at full stops so each idea lands before the next. Tone: conversational, confident, no announcer polish. Pronunciation: say technical terms exactly (LangGraph, reducer, subgraph, Send, super-step, checkpoint), spell out initialisms letter by letter (T L T, C I O, I E X), and read numbers naturally.",
+  "fixes": [
+    {
+      "scene": "D",
+      "written": "15%",
+      "spoken": "15 percent"
+    },
+    {
+      "scene": "D",
+      "written": "35%",
+      "spoken": "35 percent"
+    },
+    {
+      "scene": "D",
+      "written": "30%",
+      "spoken": "30 percent"
+    },
+    {
+      "scene": "D",
+      "written": "20%",
+      "spoken": "20 percent"
+    },
+    {
+      "scene": "G",
+      "written": "$11.5M",
+      "spoken": "11.5 million dollars"
+    },
+    {
+      "scene": "G",
+      "written": "98.5%",
+      "spoken": "98.5 percent"
+    },
+    {
+      "scene": "G",
+      "written": "9.5%",
+      "spoken": "9.5 percent"
+    }
+  ]
+}

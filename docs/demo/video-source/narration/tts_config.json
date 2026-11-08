@@ -1,0 +1,6 @@
+{
+  "model": "gpt-4o-mini-tts",
+  "fallback_model": "tts-1-hd",
+  "voice": "marin",
+  "instructions": "Voice: a calm, precise, friendly engineer walking a colleague through a system they built, with a slight dry smile. Pace: measured and clear, never rushed, a short breath at each comma and a slightly longer one at full stops so each idea lands before the next. Tone: conversational, confident, no announcer polish. Pronunciation: say technical terms exactly (LangGraph, reducer, subgraph, Send, super-step, checkpoint), spell out initialisms letter by letter (T L T, C I O, I E X), and read numbers naturally."
+}
