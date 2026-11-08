@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "trading_desk": "./src/trading_desk/graph.py:graph"
+  },
+  "env": ".env"
+}
