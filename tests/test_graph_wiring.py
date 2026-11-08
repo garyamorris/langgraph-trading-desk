@@ -23,6 +23,9 @@ from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from pydantic import BaseModel
 
 import trading_desk.graph as g
+from trading_desk import prompts
+from trading_desk.limits import MANDATE_LIMITS, REVISION_TARGETS, fmt_pct, fmt_usd
+from trading_desk.tools import FIRM_BOOK_STATE, evaluate_multi_desk_book_risk
 from trading_desk.state import (
     AdversarialDebateResolution,
     CIORegimeMandate,
@@ -260,6 +263,11 @@ class GraphWiringTests(unittest.TestCase):
         self.assertIn("proposed REVISE_DESKS", risk.cro_commentary)
         self.assertNotIn(LLM_NARRATIVE, risk.cro_commentary)
 
+    def test_every_focus_ticker_gets_a_dossier(self):
+        # Used to be capped at 4 of 6, leaving e.g. TLT and QQQ unresearched while desks traded them.
+        _, _, final = run_graph(Scenario())
+        self.assertEqual(set(final["ticker_dossiers"]), {"NVDA", "AMD", "MSFT", "SPY", "QQQ", "TLT"})
+
     def test_typed_state_survives_checkpoint_roundtrip(self):
         # Use exactly the allowlist langgraph.json gives the dev server, so this also holds in strict-msgpack mode.
         with open(ROOT / "langgraph.json") as fh:
@@ -289,6 +297,65 @@ class GraphWiringTests(unittest.TestCase):
         for model in (TickerDeepResearchDossier, AdversarialDebateResolution, PortfolioRiskReport, ExecutionMicrostructurePlan):
             props = convert_to_openai_tool(model)["function"]["parameters"]["properties"]
             self.assertNotIn("openai_decisions_api", props, model.__name__)
+
+
+class LimitsTests(unittest.TestCase):
+    """The engine, the revision clamp and the prompts must all read the same numbers."""
+
+    def test_revision_targets_sit_inside_the_mandate_limits(self):
+        for key, target in REVISION_TARGETS.items():
+            self.assertLess(target, MANDATE_LIMITS[key], key)
+
+    def test_engine_enforces_the_shared_mandate_limits(self):
+        self.assertEqual(FIRM_BOOK_STATE["risk_mandate_limits"], MANDATE_LIMITS)
+
+    def test_prompts_and_revision_context_use_the_shared_numbers(self):
+        head = prompts.DESK_HEAD_SUBGRAPH_PROMPT.format(desk_name="MOMENTUM_DESK")
+        context = g._build_desk_context(
+            {
+                "revision_count": 1,
+                "risk_assessment": stub(PortfolioRiskReport, limit_breaches=["x"]),
+            },
+            "MOMENTUM_DESK",
+        )
+        wanted = [
+            fmt_usd(REVISION_TARGETS["max_single_leg_notional_usd"]),
+            fmt_usd(REVISION_TARGETS["max_desk_gross_notional_usd"]),
+            fmt_pct(REVISION_TARGETS["max_stop_loss_distance_pct"]),
+            fmt_pct(MANDATE_LIMITS["max_sector_net_exposure_pct_nav"]),
+        ]
+        for text in wanted:
+            self.assertIn(text, head)
+            self.assertIn(text, context)
+        self.assertIn(fmt_usd(MANDATE_LIMITS["max_portfolio_var_99_1d_usd"]), head)
+        self.assertIn(fmt_pct(MANDATE_LIMITS["max_sector_net_exposure_pct_nav"]), prompts.FACTOR_EXPOSURE_AUDITOR_PROMPT)
+
+    def test_revision_clamp_brings_legs_inside_targets_and_engine_limits(self):
+        def mk(direction, stop):
+            return stub(
+                StrategyOrderLeg,
+                desk="MOMENTUM_DESK",
+                ticker="MSFT",
+                direction=direction,
+                instrument="EQUITY",
+                notional_usd=12_000_000.0,
+                entry_price=100.0,
+                stop_loss=stop,
+            )
+
+        proposal = stub(DeskMandateProposal, desk_name="MOMENTUM_DESK", proposed_legs=[mk("LONG", 93.0), mk("SHORT", 107.0)])
+        g._enforce_revision_limits(proposal)
+
+        for clamped in proposal.proposed_legs:
+            self.assertEqual(clamped.notional_usd, REVISION_TARGETS["max_single_leg_notional_usd"])
+            dist = abs(clamped.entry_price - clamped.stop_loss) / clamped.entry_price * 100.0
+            self.assertLessEqual(dist, REVISION_TARGETS["max_stop_loss_distance_pct"] + 0.01)
+        self.assertLess(proposal.proposed_legs[0].stop_loss, 100.0)  # LONG stop stays below entry
+        self.assertGreater(proposal.proposed_legs[1].stop_loss, 100.0)  # SHORT stop stays above entry
+
+        # And the real engine agrees: no single-leg or stop-distance breach remains.
+        result = evaluate_multi_desk_book_risk.invoke({"proposed_legs": [x.model_dump() for x in proposal.proposed_legs]})
+        self.assertFalse([b for b in result["limit_breaches"] if "single-leg" in b or "stop-loss" in b])
 
 
 if __name__ == "__main__":

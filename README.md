@@ -92,6 +92,8 @@ flowchart TD
 
 The Decisions API answers are stored on the models as `openai_decisions_api`. That field is hidden from the LLM's structured-output schema.
 
+Risk numbers live in one place, [`limits.py`](src/trading_desk/limits.py): `MANDATE_LIMITS` are the hard caps the risk engine enforces, and `REVISION_TARGETS` are the tighter numbers desks are told to meet (and the revision clamp enforces) on a revision round. The engine, clamp, prompts and CRO messages all read from it.
+
 Because the state holds Pydantic models, `langgraph.json` allowlists them under `serde.allowed_msgpack_modules`. Add a new top-level state model there if you add one.
 
 ---

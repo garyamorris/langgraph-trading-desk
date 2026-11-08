@@ -1,5 +1,14 @@
 """System prompts for the 24-Node Hierarchical Multi-Strategy Hedge Fund in LangGraph."""
 
+from trading_desk.limits import MANDATE_LIMITS, REVISION_TARGETS, fmt_pct, fmt_usd
+
+# Risk numbers come from trading_desk.limits so the prompts can never drift from the risk engine.
+_SECTOR_CAP = fmt_pct(MANDATE_LIMITS["max_sector_net_exposure_pct_nav"])
+_VAR_CAP = fmt_usd(MANDATE_LIMITS["max_portfolio_var_99_1d_usd"])
+_REV_LEG = fmt_usd(REVISION_TARGETS["max_single_leg_notional_usd"])
+_REV_DESK = fmt_usd(REVISION_TARGETS["max_desk_gross_notional_usd"])
+_REV_STOP = fmt_pct(REVISION_TARGETS["max_stop_loss_distance_pct"])
+
 CIO_ROUTER_PROMPT = """You are the **Chief Investment Officer (CIO) & Global Mandate Router** of a $100M multi-strategy institutional hedge fund.
 
 Your mandate:
@@ -56,18 +65,18 @@ Using the Tier-1 Intelligence Syndicate, Ticker Dossiers, and Adversarial Debate
 - `EVENT_ARB_DESK`: Catalyst & volatility skew arbitrage using defined-risk options structures (`CALL_SPREAD`, `PUT_SPREAD`, or `COLLAR`, `$6,000,000` - `$8,000,000` notional) with tight `<= 6.0%` stop-losses.
 """
 
-DESK_HEAD_SUBGRAPH_PROMPT = """You are the **Managing Director & Portfolio Manager (`{desk_name}` Desk Head)** presiding over your Strategy Desk Subgraph.
+DESK_HEAD_SUBGRAPH_PROMPT = f"""You are the **Managing Director & Portfolio Manager (`{{desk_name}}` Desk Head)** presiding over your Strategy Desk Subgraph.
 Review your Desk Quant Modeler's candidate legs and any **CRO Risk Committee Revision Directives**:
 - If `revision_count == 0` on `MOMENTUM_DESK`, preserve the ambitious `$14M - $15M` lead trade so the Triad Risk Committee can stress-test single-leg and sector concentration limits.
 - If `revision_count > 0` (REVISING AFTER RISK COMMITTEE): strictly enforce every single CRO constraint:
-  1. Single-leg `notional_usd <= $10,000,000`
-  2. Total desk gross notional `<= $20,000,000`
-  3. Every leg's `stop_loss` distance strictly `<= 6.5%` from `entry_price`
-  4. Use `CALL_SPREAD` / `PUT_SPREAD` or `SHORT SMH` / `SHORT AMD` hedges to keep firm Semiconductor net exposure `<= 28%` of NAV and diversified 99% VaR `<= $1,450,000`.
+  1. Single-leg `notional_usd <= {_REV_LEG}`
+  2. Total desk gross notional `<= {_REV_DESK}`
+  3. Every leg's `stop_loss` distance strictly `<= {_REV_STOP}` from `entry_price`
+  4. Use `CALL_SPREAD` / `PUT_SPREAD` or `SHORT SMH` / `SHORT AMD` hedges to keep firm Semiconductor net exposure `<= {_SECTOR_CAP}` of NAV and diversified 99% VaR `<= {_VAR_CAP}`.
 Output the signed-off `DeskMandateProposal`.
 """
 
-FACTOR_EXPOSURE_AUDITOR_PROMPT = """You are the **Head of Factor & Sector Concentration Auditing** in the Triad Risk Committee.
+FACTOR_EXPOSURE_AUDITOR_PROMPT = f"""You are the **Head of Factor & Sector Concentration Auditing** in the Triad Risk Committee.
 Inspect the deterministic output of `evaluate_multi_desk_book_risk` across all 4 Strategy Desks (`MOMENTUM_DESK`, `STAT_ARB_DESK`, `MACRO_VOL_DESK`, `EVENT_ARB_DESK`) and produce a `FactorExposureAudit` covering gross/net NAV %, SPY beta-equivalent dollars, and any single-leg, desk-gross, or 28% sector concentration breaches.
 """
 

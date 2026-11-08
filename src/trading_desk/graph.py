@@ -22,6 +22,7 @@ from trading_desk.decisions_engine import (
     judge_debate_via_decisions_api,
     select_ems_algos_via_decisions_api,
 )
+from trading_desk.limits import MANDATE_LIMITS, REVISION_TARGETS, fmt_pct, fmt_usd
 from trading_desk.prompts import (
     BEAR_SHORT_SELLER_PROMPT,
     BULL_DIRECTOR_PROMPT,
@@ -231,7 +232,7 @@ def fan_out_from_cio_router(state: TradingDeskState) -> list[str | Send]:
     ]
     # Dynamic Map-Reduce: spawn one parallel worker execution per ticker
     dynamic_sends = [
-        Send("ticker_deep_research_worker", {"ticker": sym}) for sym in tickers[:4]
+        Send("ticker_deep_research_worker", {"ticker": sym}) for sym in tickers
     ]
     return static_branches + dynamic_sends
 
@@ -657,9 +658,11 @@ def _build_desk_context(state: TradingDeskState, desk_name: str) -> str:
             f"Firm-Wide Active Breaches:\n{_json(prior_risk.limit_breaches)}\n\n"
             f"Specific Directive for {desk_name}:\n{directive}\n\n"
             "MANDATORY COMPLIANCE RULES FOR REVISION:\n"
-            "1. Every single leg `notional_usd` MUST be <= $9,000,000 (and total desk gross <= $18,000,000).\n"
-            "2. Every single leg `stop_loss` MUST be within <= 6.2% of `entry_price`.\n"
-            "3. For `MOMENTUM_DESK`, use `CALL_SPREAD` on NVDA/Semiconductors to cap tail VaR and keep firm Semiconductor concentration <= 28% of NAV.\n"
+            f"1. Every single leg `notional_usd` MUST be <= {fmt_usd(REVISION_TARGETS['max_single_leg_notional_usd'])} "
+            f"(and total desk gross <= {fmt_usd(REVISION_TARGETS['max_desk_gross_notional_usd'])}).\n"
+            f"2. Every single leg `stop_loss` MUST be within <= {fmt_pct(REVISION_TARGETS['max_stop_loss_distance_pct'])} of `entry_price`.\n"
+            "3. For `MOMENTUM_DESK`, use `CALL_SPREAD` on NVDA/Semiconductors to cap tail VaR and keep firm Semiconductor "
+            f"concentration <= {fmt_pct(MANDATE_LIMITS['max_sector_net_exposure_pct_nav'])} of NAV.\n"
             "4. For `STAT_ARB_DESK`, ensure the SHORT Semiconductor leg (`SHORT SMH` or `SHORT AMD`) is at least as large as any LONG Semiconductor leg."
         )
     return "\n".join(parts)
@@ -679,14 +682,20 @@ def dispatch_strategy_desks(state: TradingDeskState) -> list[Send]:
 
 
 def _enforce_revision_limits(proposal: DeskMandateProposal) -> None:
-    """Hard clamps on revision rounds so a desk head cannot re-submit an oversized book."""
+    """Hard clamps on revision rounds so a desk head cannot re-submit an oversized book.
+
+    Clamps to the same `REVISION_TARGETS` the desk was told to meet, which sit inside the engine's hard limits.
+    """
+    max_leg = REVISION_TARGETS["max_single_leg_notional_usd"]
+    max_stop_pct = REVISION_TARGETS["max_stop_loss_distance_pct"]
     for leg in proposal.proposed_legs:
-        if leg.notional_usd > 8_500_000:
-            leg.notional_usd = 8_000_000.0
+        if leg.notional_usd > max_leg:
+            leg.notional_usd = float(max_leg)
         if leg.entry_price > 0:
             dist_pct = abs(leg.entry_price - leg.stop_loss) / leg.entry_price * 100.0
-            if dist_pct > 6.5:
-                leg.stop_loss = round(leg.entry_price * (0.94 if leg.direction == "LONG" else 1.06), 2)
+            if dist_pct > max_stop_pct:
+                factor = 1 - max_stop_pct / 100.0 if leg.direction == "LONG" else 1 + max_stop_pct / 100.0
+                leg.stop_loss = round(leg.entry_price * factor, 2)
         if proposal.desk_name == "MOMENTUM_DESK" and leg.ticker in ("NVDA", "AMD", "SMH") and leg.instrument == "EQUITY":
             leg.instrument = "CALL_SPREAD"
 
@@ -948,7 +957,11 @@ def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
     breaches_md = (
         "\n".join(f"  - ❌ {b}" for b in report.limit_breaches)
         if report.limit_breaches
-        else "  - ✅ Zero breaches across single-leg caps, desk gross caps, 28% sector concentration, stop distance, and $1.45M VaR"
+        else (
+            "  - ✅ Zero breaches across single-leg caps, desk gross caps, "
+            f"{fmt_pct(MANDATE_LIMITS['max_sector_net_exposure_pct_nav'])} sector concentration, stop distance, "
+            f"and {fmt_usd(MANDATE_LIMITS['max_portfolio_var_99_1d_usd'])} VaR"
+        )
     )
     directives_md = "\n".join(
         f"  - **{d.desk_name}** (`must_revise={d.must_revise}`): {d.directive}"

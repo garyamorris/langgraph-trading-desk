@@ -15,6 +15,8 @@ import numpy as np
 from dotenv import load_dotenv
 from langchain_core.tools import tool
 
+from trading_desk.limits import MANDATE_LIMITS
+
 load_dotenv()
 
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -72,15 +74,7 @@ FIRM_BOOK_STATE: dict[str, Any] = {
         "Index / Macro Hedge": -13_000_000,
         "Rates / Duration": 0,
     },
-    "risk_mandate_limits": {
-        "max_single_leg_notional_usd": 12_000_000,
-        "max_desk_gross_notional_usd": 22_000_000,
-        "max_post_trade_firm_gross_pct_nav": 125.0,
-        "max_post_trade_firm_net_pct_nav": 40.0,
-        "max_sector_net_exposure_pct_nav": 28.0,
-        "max_portfolio_var_99_1d_usd": 1_450_000,
-        "max_stop_loss_distance_pct": 7.5,
-    },
+    "risk_mandate_limits": dict(MANDATE_LIMITS),
 }
 
 
@@ -544,10 +538,10 @@ def get_firm_portfolio_and_mandate() -> dict[str, Any]:
 def evaluate_multi_desk_book_risk(proposed_legs: list[dict[str, Any]]) -> dict[str, Any]:
     """Run quantitative multi-desk portfolio risk analysis across all proposed legs:
     - Computes gross/net exposure by desk and firm-wide (% of $100M NAV)
-    - Computes post-trade sector net concentration vs 28% limit
+    - Computes post-trade sector net concentration vs the sector limit
     - Computes beta-adjusted SPY dollar exposure
     - Computes diversified 99% 1-day parametric VaR and 3.5-sigma stressed VaR (accounting for LONG/SHORT offsets)
-    - Checks individual leg notional caps ($12M), desk gross caps ($24M), and stop-loss distance limits (<= 7.5%).
+    - Checks individual leg notional caps, desk gross caps, and stop-loss distance limits (see trading_desk.limits).
     """
     nav = float(FIRM_BOOK_STATE["firm_nav_usd"])
     limits = FIRM_BOOK_STATE["risk_mandate_limits"]
@@ -609,7 +603,7 @@ def evaluate_multi_desk_book_risk(proposed_legs: list[dict[str, Any]]) -> dict[s
         gross_var_sum += leg_var_99
         signed_var_contributions.append(sign * leg_var_99 * beta)
 
-        # Check 1: Single-leg notional cap ($12M)
+        # Check 1: Single-leg notional cap
         if notional > limits["max_single_leg_notional_usd"]:
             msg = (
                 f"[{desk}] {ticker} single-leg notional (${notional:,.0f}) exceeds cap of "
@@ -620,7 +614,7 @@ def evaluate_multi_desk_book_risk(proposed_legs: list[dict[str, Any]]) -> dict[s
                 f"Cut {ticker} notional_usd from ${notional:,.0f} to <= ${limits['max_single_leg_notional_usd']:,.0f}."
             )
 
-        # Check 2: Stop-loss distance limit (<= 7.5%)
+        # Check 2: Stop-loss distance limit
         if entry_px > 0:
             stop_dist_pct = abs(entry_px - stop_px) / entry_px * 100.0
             if stop_dist_pct > limits["max_stop_loss_distance_pct"]:
@@ -638,7 +632,7 @@ def evaluate_multi_desk_book_risk(proposed_legs: list[dict[str, Any]]) -> dict[s
                     f"Tighten {ticker} stop_loss to ${tight_stop:.2f} (<= {limits['max_stop_loss_distance_pct']:.1f}% from entry)."
                 )
 
-    # Check 3: Desk Gross Notional Cap ($24M per desk)
+    # Check 3: Desk Gross Notional Cap (per desk)
     for d_name, d_gross in desk_gross.items():
         if d_gross > limits["max_desk_gross_notional_usd"]:
             msg = (
@@ -650,7 +644,7 @@ def evaluate_multi_desk_book_risk(proposed_legs: list[dict[str, Any]]) -> dict[s
                 f"Scale down total {d_name} gross notional from ${d_gross:,.0f} to <= ${limits['max_desk_gross_notional_usd']:,.0f}."
             )
 
-    # Check 4: Post-trade Sector Net Concentration (<= 28% of NAV)
+    # Check 4: Post-trade Sector Net Concentration (% of NAV)
     sector_net_pct = {sec: round((val / nav) * 100.0, 2) for sec, val in sector_net.items()}
     for sec, pct in sector_net_pct.items():
         if abs(pct) > limits["max_sector_net_exposure_pct_nav"]:
