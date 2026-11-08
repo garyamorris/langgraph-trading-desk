@@ -36,6 +36,7 @@ from trading_desk.state import (
 
 ALL_DESKS = g.ALL_DESKS
 ROOT = Path(__file__).resolve().parent.parent
+LLM_NARRATIVE = "LLM narrative"
 
 
 # ---------------------------------------------------------------------------
@@ -89,7 +90,7 @@ class Scenario:
         self.desk_books = desk_books or (lambda desk, rev: compliant(desk))
         self.llm_cro_status = llm_cro_status
         self.desk_head_calls: list[tuple[str, int]] = []
-        self.node_trace: list[str] = []
+        self.cro_prompts: list[str] = []
 
 
 def compliant(desk: str) -> list[StrategyOrderLeg]:
@@ -112,7 +113,8 @@ class FakeStructured:
             desk = re.search(r"TARGET STRATEGY DESK: (\w+)", text).group(1)
             return stub(schema, desk_name=desk)
         if schema is PortfolioRiskReport:
-            return stub(schema, status=sc.llm_cro_status)
+            sc.cro_prompts.append(text)
+            return stub(schema, status=sc.llm_cro_status, cro_commentary=LLM_NARRATIVE)
         if schema is CIORegimeMandate:
             return stub(schema, focus_tickers=["NVDA", "AMD", "MSFT", "SPY", "QQQ", "TLT"], active_desks=ALL_DESKS)
         if schema is HeadOfTradingDecision:
@@ -184,6 +186,8 @@ class GraphWiringTests(unittest.TestCase):
         _, _, final = run_graph(sc)
 
         self.assertEqual(final["risk_assessment"].status, "APPROVED")
+        self.assertEqual(final["risk_assessment"].cro_commentary, LLM_NARRATIVE)  # LLM agreed, so its text is kept
+        self.assertIn("DETERMINISTIC RISK ENGINE VERDICT (authoritative and final): `APPROVED`", sc.cro_prompts[-1])
         self.assertEqual(set(final["desk_proposals"]), set(ALL_DESKS))
         for proposal in final["desk_proposals"].values():
             self.assertIsInstance(proposal, DeskMandateProposal)
@@ -229,10 +233,32 @@ class GraphWiringTests(unittest.TestCase):
         self.assertEqual(final["risk_assessment"].status, "REJECTED")
         self.assertEqual(final["revision_count"], 2)
         self.assertTrue(final["risk_assessment"].limit_breaches)
+        commentary = final["risk_assessment"].cro_commentary
+        self.assertIn("Risk engine verdict: REJECTED", commentary)
+        self.assertIn("proposed APPROVED", commentary)
+        self.assertNotIn(LLM_NARRATIVE, commentary)
         self.assertIsNone(final.get("head_of_trading_decision"))
         self.assertIsNone(final.get("execution_microstructure_plan"))
         self.assertEqual(sent_by(final)[-1], "CRO_Trading_Halt")
         self.assertNotIn("Head_Of_Trading", sent_by(final))
+
+    def test_commentary_is_replaced_when_llm_disagrees_with_final_approval(self):
+        # Live-run bug: the LLM CRO kept talking about a breach after the engine had approved the revised book.
+        def books(desk, rev):
+            if desk == "MOMENTUM_DESK" and rev == 0:
+                return [leg(desk, "NVDA", "LONG", 14e6)]
+            return compliant(desk)
+
+        sc = Scenario(desk_books=books, llm_cro_status="REVISE_DESKS")
+        _, _, final = run_graph(sc)
+
+        risk = final["risk_assessment"]
+        self.assertEqual(risk.status, "APPROVED")
+        self.assertEqual(risk.limit_breaches, [])
+        self.assertIn("Risk engine verdict: APPROVED", risk.cro_commentary)
+        self.assertIn("No limit breaches.", risk.cro_commentary)
+        self.assertIn("proposed REVISE_DESKS", risk.cro_commentary)
+        self.assertNotIn(LLM_NARRATIVE, risk.cro_commentary)
 
     def test_typed_state_survives_checkpoint_roundtrip(self):
         # Use exactly the allowlist langgraph.json gives the dev server, so this also holds in strict-msgpack mode.

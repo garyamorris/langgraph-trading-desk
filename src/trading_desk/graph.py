@@ -830,6 +830,39 @@ def tail_var_monte_carlo_node(state: TradingDeskState) -> dict[str, Any]:
     return {"risk_sub_reports": {"tail_var_mc": mc_report}}
 
 
+def _engine_verdict(quant_eval: dict[str, Any], rev: int, max_rev: int) -> tuple[str, list[str]]:
+    """The CRO gate, decided by the deterministic engine alone. Fails closed once revisions are exhausted."""
+    if quant_eval["all_checks_passed"]:
+        return "APPROVED", []
+    return ("REVISE_DESKS" if rev < max_rev else "REJECTED"), list(quant_eval["limit_breaches"])
+
+
+def _engine_commentary(
+    quant_eval: dict[str, Any],
+    status: str,
+    rev: int,
+    max_rev: int,
+    directives: list[DeskRiskDirective],
+) -> str:
+    """Commentary built only from the engine's numbers, used when the LLM's narrative disagrees with the verdict."""
+    parts = [
+        f"Risk engine verdict: {status} (revision round {rev} of max {max_rev}).",
+        f"Post-trade exposure is {quant_eval['post_trade_firm_gross_pct_nav']:.1f}% gross / "
+        f"{quant_eval['post_trade_firm_net_pct_nav']:+.1f}% net of NAV; diversified 99% 1-day VaR is "
+        f"${quant_eval['portfolio_var_99_1d_usd']:,.0f} against a ${quant_eval['max_portfolio_var_99_limit_usd']:,.0f} limit; "
+        f"stressed VaR is ${quant_eval['stressed_var_99_usd']:,.0f}.",
+    ]
+    breaches = quant_eval["limit_breaches"]
+    if breaches:
+        parts.append(f"{len(breaches)} limit breach(es): " + " ".join(breaches))
+        flagged = [d.desk_name for d in directives if d.must_revise]
+        if flagged:
+            parts.append("Desks flagged for revision: " + ", ".join(flagged) + ".")
+    else:
+        parts.append("No limit breaches.")
+    return " ".join(parts)
+
+
 def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
     """Chief Risk Officer (CRO) Synthesis node: combines Factor Audit + Tail-VaR Stress Report + OpenAI Decisions API Gate."""
     llm = _get_llm()
@@ -842,6 +875,8 @@ def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
 
     rev = state.get("revision_count") or 0
     max_rev = state.get("max_revisions") or 2
+    engine_status, engine_breaches = _engine_verdict(quant_eval, rev, max_rev)
+    flagged_desks = [k for k, v in quant_eval.get("desk_must_revise_map", {}).items() if v]
 
     risk_evidence_str = (
         f"Revision Round: {rev} of max {max_rev}\n"
@@ -863,11 +898,17 @@ def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
                     f"{risk_evidence_str}\n\n"
                     f"OpenAI Decisions API (`gpt-6-luna`) CRO Risk Gate:\n"
                     f"{json.dumps(cro_decisions, indent=2)}\n\n"
+                    f"DETERMINISTIC RISK ENGINE VERDICT (authoritative and final): `{engine_status}`.\n"
+                    f"Limit breaches: {json.dumps(engine_breaches)}\n"
+                    f"Desks flagged for revision: {json.dumps(flagged_desks)}\n"
+                    "Set `status` to this verdict and write `cro_commentary` consistent with it. "
+                    "Do not cite breaches that the engine did not report.\n\n"
                     "Produce the master `PortfolioRiskReport`."
                 )
             ),
         ]
     )
+    llm_status = report.status
 
     must_revise_map = quant_eval.get("desk_must_revise_map", {})
     quant_directives = [
@@ -881,16 +922,16 @@ def cro_risk_synthesis_node(state: TradingDeskState) -> dict[str, Any]:
 
     # The deterministic engine decides the gate; the LLM's own `status` is never trusted.
     # Fail closed: breaches that survive the last revision round are REJECTED, not waved through.
-    if quant_eval["all_checks_passed"]:
-        report.status = "APPROVED"
-        report.limit_breaches = []
-    elif rev < max_rev:
-        report.status = "REVISE_DESKS"
-        report.limit_breaches = quant_eval["limit_breaches"]
-    else:
-        report.status = "REJECTED"
-        report.limit_breaches = quant_eval["limit_breaches"]
+    report.status = engine_status  # type: ignore[assignment]
+    report.limit_breaches = engine_breaches
     report.desk_directives = quant_directives
+    if llm_status != engine_status:
+        # The LLM wrote its narrative for a different verdict, so it would contradict the gate. Use the engine's.
+        report.cro_commentary = (
+            f"{_engine_commentary(quant_eval, engine_status, rev, max_rev, quant_directives)} "
+            f"(The LLM CRO draft proposed {llm_status}; its narrative was replaced because it disagreed "
+            "with the deterministic engine.)"
+        )
 
     report.combined_gross_exposure_pct_nav = quant_eval["post_trade_firm_gross_pct_nav"]
     report.combined_net_exposure_pct_nav = quant_eval["post_trade_firm_net_pct_nav"]
